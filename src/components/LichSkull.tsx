@@ -1,5 +1,7 @@
 import { useRef, useState, useCallback } from 'react';
 import { useGameStore } from '../store/gameStore';
+import { soundManager } from '../systems/soundManager';
+import { Skull, Sparkles } from 'lucide-react';
 
 interface Particle { id: number; x: number; y: number; }
 
@@ -11,15 +13,44 @@ export default function LichSkull() {
   const pid = useRef(0);
 
   const handleClick = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    soundManager.init(); // Initialize audio context on first click
     click();
+    
+    const isFrenzyActive = frenzy.active && Date.now() < frenzy.endsAt;
+    soundManager.playClick(isFrenzyActive);
+    
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const isTouch = 'touches' in e;
-    const x = isTouch ? e.touches[0].clientX - rect.left : (e as React.MouseEvent).clientX - rect.left;
-    const y = isTouch ? e.touches[0].clientY - rect.top  : (e as React.MouseEvent).clientY - rect.top;
+    const clientX = isTouch ? (e as React.TouchEvent).touches[0].clientX : (e as React.MouseEvent).clientX;
+    const clientY = isTouch ? (e as React.TouchEvent).touches[0].clientY : (e as React.MouseEvent).clientY;
+    
+    // Relative to the container
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    
     const id = pid.current++;
     setParticles(p => [...p, { id, x, y }]);
     setTimeout(() => setParticles(p => p.filter(pt => pt.id !== id)), 800);
-  }, [click]);
+  }, [click, frenzy]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      
+      soundManager.init();
+      click();
+      
+      const isFrenzyActive = frenzy.active && Date.now() < frenzy.endsAt;
+      soundManager.playClick(isFrenzyActive);
+      
+      // Spawn particle in center for keyboard clicks
+      const x = 80; // approx center
+      const y = 80;
+      const id = pid.current++;
+      setParticles(p => [...p, { id, x, y }]);
+      setTimeout(() => setParticles(p => p.filter(pt => pt.id !== id)), 800);
+    }
+  }, [click, frenzy]);
 
   const isFrenzy     = frenzy.active && Date.now() < frenzy.endsAt;
   const hasRitualMult = ritual.activeMultiplier > 1 && Date.now() < ritual.activeUntil;
@@ -42,21 +73,25 @@ export default function LichSkull() {
       <div
         className={`relative w-40 h-40 md:w-44 md:h-44 flex items-center justify-center
                     cursor-pointer select-none transition-transform duration-75
-                    hover:scale-105 active:scale-95`}
+                    hover:scale-105 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-full`}
         onClick={handleClick}
         onTouchStart={handleClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
         role="button"
         aria-label="Lich'e tıkla"
       >
-        <span className={`relative z-10 text-[6rem] md:text-[7rem] leading-none
+        <div className={`relative z-10 
                           text-gold drop-shadow-[0_0_20px_rgba(212,175,55,0.6)]
                           transition-colors duration-300
                           ${isFrenzy ? 'anim-frenzy-pulse !text-orange-400 drop-shadow-[0_0_30px_#ff6b35]' : ''}`}>
-          ☠
-        </span>
+          <Skull size={112} strokeWidth={1.5} />
+        </div>
         <div className="skull-glow anim-glow-pulse" />
         {particles.map(p => (
-          <div key={p.id} className="soul-particle" style={{ left: p.x, top: p.y }}>✦</div>
+          <div key={p.id} className="soul-particle" style={{ left: p.x, top: p.y }}>
+            <Sparkles size={20} />
+          </div>
         ))}
       </div>
 

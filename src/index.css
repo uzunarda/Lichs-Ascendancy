@@ -27,4 +27,16 @@
   .text-shadow-blood {
     text-shadow: 0 0 8px rgba(139, 26, 26, 0.8);
   }
+
+  .tooltip-host {
+    @apply relative;
+  }
+  
+  .tooltip-box {
+    @apply fixed bg-dark/95 border border-border text-ink px-3 py-2 rounded shadow-2xl z-50 pointer-events-none;
+    transform: translate(-50%, -100%);
+    font-size: 0.75rem;
+    white-space: pre-wrap;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+  }
 }

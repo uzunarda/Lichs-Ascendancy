@@ -163,6 +163,8 @@ export const UPGRADES: UpgradeData[] = [
   { id: 'helper_zombie_1', name: 'Zombi Evrim', category: 'helper', cost: 2000, description: 'Zombi Hasat Edici SE/sn x2', effect: 'zombie_harvester*2', unlockCondition: 'zombie_harvester>=10', purchased: false },
   { id: 'synergy_bone_army', name: 'Kemik Ordusu', category: 'synergy', cost: 10000, description: 'Hasat Edici üretimi x3', effect: 'zombie_harvester*3', unlockCondition: 'skeleton_worker>=10&&zombie_harvester>=5', purchased: false },
   { id: 'synergy_night_lord', name: 'Gece Efendisi', category: 'synergy', cost: 50000, description: 'Vampir Ajanlar hiç uyumaz', effect: 'vampire_no_sleep', unlockCondition: 'vampire_agent>=5&&lich_apprentice>=3', purchased: false },
+  { id: 'ritual_time_1', name: 'Uzun Ritüel', category: 'ritual', cost: 2500, description: 'Ritüel süresi +5 sn', effect: 'ritualDuration+5', unlockCondition: 'se>=1000', purchased: false },
+  { id: 'ritual_chance_1', name: 'Şanslı Kan', category: 'ritual', cost: 7500, description: 'Ritüel başarı şansı +%10', effect: 'ritualChance+0.1', unlockCondition: 'se>=5000', purchased: false },
 ];
 
 export const FRENZY_CLICKS_REQUIRED = 50;

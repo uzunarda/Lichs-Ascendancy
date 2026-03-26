@@ -8,6 +8,7 @@ import HelperPanel   from './components/HelperPanel';
 import UpgradePanel  from './components/UpgradePanel';
 import RegionMap     from './components/RegionMap';
 import PrestigePanel from './components/PrestigePanel';
+import NotificationManager from './components/NotificationManager';
 import './index.css';
 import './styles/animation.css';
 type TabId = 'main' | 'army' | 'upgrades' | 'prestige';
@@ -152,6 +153,8 @@ export default function App() {
           ))}
         </nav>
       </div>
+
+      <NotificationManager />
 
       {/* Footer — sadece desktop */}
       <footer className="hidden md:flex relative z-10 items-center gap-4 px-6 py-2

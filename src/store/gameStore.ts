@@ -14,6 +14,12 @@ interface RitualState {
   activeUntil: number; // timestamp
 }
 
+export interface AppNotification {
+  id: number;
+  message: string;
+  type: 'info' | 'success' | 'warning';
+}
+
 interface GameState {
   // Resources
   se: number;
@@ -45,6 +51,7 @@ interface GameState {
   // Meta
   lastSaveTime: number;
   currentRegionIndex: number;
+  notifications: AppNotification[];
 
   // Actions
   click: () => void;
@@ -57,9 +64,12 @@ interface GameState {
   loadSave: () => void;
   saveGame: () => void;
   processOffline: () => void;
+  addNotification: (message: string, type?: 'info' | 'success' | 'warning') => void;
+  removeNotification: (id: number) => void;
 }
 
 const SAVE_KEY = 'lichs_ascendancy_save';
+let notifId = 0;
 
 function getInitialState() {
   return {
@@ -85,6 +95,7 @@ function getInitialState() {
     },
     lastSaveTime: Date.now(),
     currentRegionIndex: 0,
+    notifications: [] as AppNotification[],
   };
 }
 
@@ -200,9 +211,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       bonusSE = 100; // small ritual auto reward
     }
 
+    const newCount = currentCount + 1;
+    if (newCount % 10 === 0) {
+      get().addNotification(`Başarım: ${helperData.name} x${newCount} ulaştı. (Çarpan +%15)`, 'success');
+    }
+
     set(s => ({
       se: s.se - cost + bonusSE,
-      helpers: { ...s.helpers, [helperId]: (s.helpers[helperId] ?? 0) + 1 },
+      helpers: { ...s.helpers, [helperId]: newCount },
     }));
   },
 
@@ -232,7 +248,11 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // Lich apprentice bonus
     const lichBonus = (state.helpers['lich_apprentice'] ?? 0) * 0.05;
-    const successChance = Math.min(0.95, ritualData.chance + lichBonus);
+    
+    // Ritual chance upgrade
+    const chanceUpgrade = state.upgrades.find(u => u.effect === 'ritualChance+0.1' && u.purchased) ? 0.1 : 0;
+    
+    const successChance = Math.min(0.95, ritualData.chance + lichBonus + chanceUpgrade);
     const success = Math.random() < successChance;
 
     if (success) {
@@ -243,12 +263,15 @@ export const useGameStore = create<GameState>((set, get) => ({
         }));
         return { success: true, reward: 'ClickPower kalıcı +%5!' };
       } else {
+        // Ritual duration upgrade
+        const durationBonus = state.upgrades.find(u => u.effect === 'ritualDuration+5' && u.purchased) ? 5000 : 0;
+        
         set(s => ({
           se: s.se - ritualData.cost,
           ritual: {
             ...s.ritual,
             activeMultiplier: ritualData.mult,
-            activeUntil: Date.now() + ritualData.duration,
+            activeUntil: Date.now() + ritualData.duration + durationBonus,
           },
         }));
         return { success: true, reward: `SE x${ritualData.mult} aktif!` };
@@ -355,7 +378,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentRegionIndex: state.currentRegionIndex,
       savedAt: Date.now(),
     };
-    localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+    
+    // Hash generator (simple structural, client-side only security prevention)
+    const jsonStr = JSON.stringify(saveData);
+    let hash = 0;
+    for (let i = 0; i < jsonStr.length; i++) {
+      hash = ((hash << 5) - hash) + jsonStr.charCodeAt(i);
+      hash |= 0;
+    }
+    
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ data: saveData, hash }));
     set({ lastSaveTime: Date.now() });
   },
 
@@ -363,7 +395,26 @@ export const useGameStore = create<GameState>((set, get) => ({
     try {
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return;
-      const data = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      
+      // Handle legacy saves or new hash saves
+      let data = parsed;
+      if (parsed.data && parsed.hash !== undefined) {
+        data = parsed.data;
+        // Verify hash
+        const jsonStr = JSON.stringify(data);
+        let checkHash = 0;
+        for (let i = 0; i < jsonStr.length; i++) {
+          checkHash = ((checkHash << 5) - checkHash) + jsonStr.charCodeAt(i);
+          checkHash |= 0;
+        }
+        if (checkHash !== parsed.hash) {
+          console.error('Save file integrity check failed! Modifications detected.');
+          // We could return here to block loading, but for usability we allow it and just log.
+          // For strict anti-cheat: return;
+        }
+      }
+
       set({
         se: data.se ?? 0,
         totalSE: data.totalSE ?? 0,
@@ -386,9 +437,16 @@ export const useGameStore = create<GameState>((set, get) => ({
     try {
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return;
-      const data = JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      const data = parsed.data ? parsed.data : parsed;
+      
       const savedAt = data.savedAt ?? Date.now();
-      const offlineSeconds = Math.min((Date.now() - savedAt) / 1000, OFFLINE_MAX_SECONDS);
+      
+      // Check for passive offline upgrade (Gece Görüşü 8h -> 12h)
+      const hasNightVision = data.prestigePowers?.find((p: any) => p.id === 'night_vision' && p.purchased);
+      const maxSeconds = hasNightVision ? OFFLINE_MAX_SECONDS * 1.5 : OFFLINE_MAX_SECONDS;
+      
+      const offlineSeconds = Math.min((Date.now() - savedAt) / 1000, maxSeconds);
       if (offlineSeconds < 10) return;
 
       const state = get();
@@ -399,9 +457,24 @@ export const useGameStore = create<GameState>((set, get) => ({
         se: s.se + earned,
         totalSE: s.totalSE + earned,
       }));
-    } catch (e) {
+      } catch (e) {
       console.error('Offline process failed:', e);
     }
+  },
+
+  addNotification: (message, type = 'info') => {
+    const id = notifId++;
+    set(s => ({
+      notifications: [...s.notifications, { id, message, type }]
+    }));
+    // Auto remove after 4s
+    setTimeout(() => get().removeNotification(id), 4000);
+  },
+
+  removeNotification: (id) => {
+    set(s => ({
+      notifications: s.notifications.filter(n => n.id !== id)
+    }));
   },
 }));
 
