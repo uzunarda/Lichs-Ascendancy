@@ -78,3 +78,19 @@ export interface BuildingInstance {
   completed: boolean;
 }
 
+// ─── Phase 9: Skill Tree ─────────────────────────────────────────────────────
+
+export type SkillBranch = 'death' | 'decay' | 'chaos' | 'void';
+
+export interface SkillNode {
+  id: string;
+  name: string;
+  branch: SkillBranch;
+  description: string;
+  effect: string;
+  dpCost: number;
+  requires: string[];
+  voidPath?: boolean;
+  col: number;
+  row: number;
+}

@@ -39,14 +39,14 @@
 
 ---
 
-### FAZ 9 — Lanet Ağacı (Skill Tree) ⏱ 3–4 hafta
+### FAZ 9 — Lanet Ağacı (Skill Tree) ⏱ 3–4 hafta ✅ TAMAMLANDI
 
-- [ ] `skillTreeStore.ts` — yeni Zustand store
-- [ ] Rüya Parçası (DP) kaynak sistemi
-- [ ] 4 dal: Ölüm, Çürüme, Kaos, Yokluk (gizli)
-- [ ] 44 node toplam + dallar arası çelişki sistemi
-- [ ] Yokluk Yolu — geri alınamaz, uyarı modali
-- [ ] `SkillTreeView.tsx` — SVG tabanlı ağaç görselleştirmesi
+- [x] `skillTreeStore.ts` — Zustand store, DP kaynağı, prerequisite kontrolü, bonus hesaplama, save/load
+- [x] Rüya Parçası (DP) kaynak sistemi — store'da `dp` ve `addDP`, bonus sistemiyle entegre
+- [x] 4 dal: Ölüm, Çürüme, Kaos, Yokluk (gizli, geri alınamaz)
+- [x] 44 node toplam + dallar arası çelişki sistemi (Void sadece Death Mastery sonrası açılır)
+- [x] Yokluk Yolu — geri alınamaz, uyarı modali (VoidWarning bileşeni)
+- [x] `SkillTreeView.tsx` — SVG tabanlı ağaç görselleştirmesi, hover tooltip, aktif bonuslar özeti
 
 ---
 

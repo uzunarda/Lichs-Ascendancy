@@ -10,19 +10,22 @@ import UpgradePanel  from './components/UpgradePanel';
 import RegionMap     from './components/RegionMap';
 import PrestigePanel from './components/PrestigePanel';
 import BuildingPanel from './components/BuildingPanel';
+import SkillTreeView from './components/SkillTreeView';
 import NotificationManager from './components/NotificationManager';
 import WorldsModal   from './components/WorldsModal';
 import SettingsModal from './components/SettingsModal';
 import BottomNavbar  from './components/BottomNavbar';
 import './index.css';
 import './styles/animation.css';
-type TabId = 'main' | 'army' | 'upgrades' | 'buildings' | 'prestige';
+type TabId  = 'main' | 'army' | 'upgrades' | 'buildings' | 'skilltree' | 'prestige';
+type LeftTab = 'upgrades' | 'skilltree' | 'ritual';
 
 const TABS: { id: TabId; icon: string; label: string }[] = [
   { id: 'main',      icon: '☠',  label: 'Taht' },
   { id: 'army',      icon: '⚔',  label: 'Ordu' },
   { id: 'upgrades',  icon: '✦',  label: 'Güç' },
   { id: 'buildings', icon: '🏙', label: 'Hane' },
+  { id: 'skilltree', icon: '🕸', label: 'Ağaç' },
   { id: 'prestige',  icon: '💀', label: 'Döngü' },
 ];
 
@@ -36,10 +39,34 @@ export default function App() {
 
   const [activeTab, setActiveTab]   = useState<TabId>('main');
   const [panelTab, setPanelTab]     = useState<'helpers' | 'buildings' | 'prestige'>('helpers');
+  const [leftTab, setLeftTab]       = useState<LeftTab>('upgrades');
   const [offlineMsg, setOfflineMsg] = useState<string | null>(null);
   const [isWorldsModalOpen, setWorldsModalOpen] = useState(false);
   const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
   const tickBuildings = useBuildingStore(s => s.tickBuildings);
+
+  // ─── Desktop left panel (Upgrades / Skill Tree / Rituals) ───────────────
+  const DesktopLeftPanel = () => (
+    <>
+      <div className="flex border-b border-border bg-black/40">
+        {(['upgrades', 'skilltree', 'ritual'] as LeftTab[]).map(t => (
+          <button
+            key={t}
+            onClick={() => setLeftTab(t)}
+            className={`flex-1 py-2 font-cinzel text-[0.6rem] tracking-widest uppercase transition-colors
+              ${leftTab === t
+                ? 'text-gold border-b-2 border-gold bg-gold/5'
+                : 'text-ink-dim hover:text-ink hover:bg-white/[0.03]'}`}
+          >
+            {t === 'upgrades' ? 'Güç' : t === 'skilltree' ? 'Ağaç' : 'Ritüel'}
+          </button>
+        ))}
+      </div>
+      {leftTab === 'upgrades'  && <UpgradePanel />}
+      {leftTab === 'skilltree' && <SkillTreeView />}
+      {leftTab === 'ritual'    && <RitualPanel />}
+    </>
+  );
 
   const tickRef = useRef(tick);
   tickRef.current = tick;
@@ -108,8 +135,7 @@ export default function App() {
       {/* DESKTOP (≥ 768px) */}
       <div className="relative z-10 flex-1 hidden md:grid md:grid-cols-[320px_1fr_320px] overflow-hidden pb-12">
         <aside className="flex flex-col border-r border-border bg-black/75 backdrop-blur-sm overflow-hidden">
-          <UpgradePanel />
-          <RitualPanel />
+          <DesktopLeftPanel />
         </aside>
         
         <main className="flex flex-col items-center justify-center p-8 min-h-[70vh] relative overflow-hidden">
@@ -167,6 +193,7 @@ export default function App() {
           )}
           {activeTab === 'upgrades'  && <UpgradePanel />}
           {activeTab === 'buildings' && <BuildingPanel />}
+          {activeTab === 'skilltree' && <SkillTreeView />}
           {activeTab === 'prestige'  && <PrestigePanel />}
         </div>
 
