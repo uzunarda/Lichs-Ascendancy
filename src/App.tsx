@@ -77,7 +77,7 @@ export default function App() {
 
   return (
     <div
-      className="relative flex flex-col min-h-screen transition-all duration-[2000ms]"
+      className="relative flex flex-col h-screen overflow-hidden transition-all duration-[2000ms]"
       style={{ '--region-color': region.color } as React.CSSProperties}
     >
       {/* Arka plan */}
@@ -101,8 +101,8 @@ export default function App() {
       />
 
       {/* DESKTOP (≥ 768px) */}
-      <div className="relative z-10 flex-1 hidden md:grid md:grid-cols-[300px_1fr_300px] pb-14">
-        <aside className="flex flex-col border-r border-border bg-black/70 backdrop-blur-sm overflow-hidden gap-4 pt-4 pb-4 px-2">
+      <div className="relative z-10 flex-1 hidden md:grid md:grid-cols-[320px_1fr_320px] overflow-hidden pb-12">
+        <aside className="flex flex-col border-r border-border bg-black/75 backdrop-blur-sm overflow-hidden">
           <UpgradePanel />
           <RitualPanel />
         </aside>
@@ -125,7 +125,7 @@ export default function App() {
           </div>
         </main>
         
-        <aside className="flex flex-col border-l border-border bg-black/70 backdrop-blur-sm overflow-hidden">
+        <aside className="flex flex-col border-l border-border bg-black/75 backdrop-blur-sm overflow-hidden">
           <div className="flex border-b border-border bg-black/40">
             {(['helpers', 'prestige'] as const).map(t => (
               <button

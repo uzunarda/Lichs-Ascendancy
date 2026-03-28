@@ -5,11 +5,19 @@ import TooltipWrapper from './TooltipWrapper';
 import { Sparkles } from 'lucide-react';
 
 const CATEGORY_COLOR: Record<string, string> = {
-  click:   'border-l-gold',
-  helper:  'border-l-purple-light',
-  synergy: 'border-l-blood-light',
-  ritual:  'border-l-void',
-  passive: 'border-l-green',
+  click:   'border-l-gold bg-gold/5',
+  helper:  'border-l-purple-light bg-purple/5',
+  synergy: 'border-l-blood-light bg-blood/5',
+  ritual:  'border-l-void bg-purple/5',
+  passive: 'border-l-green bg-green/5',
+};
+
+const CATEGORY_TEXT: Record<string, string> = {
+  click:   'text-gold',
+  helper:  'text-purple-light',
+  synergy: 'text-blood-light',
+  ritual:  'text-void',
+  passive: 'text-green',
 };
 
 export default function UpgradePanel() {
@@ -30,56 +38,75 @@ export default function UpgradePanel() {
   };
 
   const available = upgrades.filter(u => !u.purchased && isUnlocked(u.unlockCondition));
-  const locked    = upgrades.filter(u => !u.purchased && !isUnlocked(u.unlockCondition)).slice(0, 3);
+  const locked    = upgrades.filter(u => !u.purchased && !isUnlocked(u.unlockCondition)).slice(0, 5);
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex items-center gap-2 font-cinzel text-[0.85rem] tracking-[0.2em] uppercase text-gold-dim
-                      px-4 py-3 border-b border-border bg-black/30">
-        <Sparkles size={18} /> YÜKSELTİMLER
+      {/* Panel Header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-black/40">
+        <div className="flex items-center gap-2 font-cinzel text-xs tracking-[0.25em] uppercase text-gold-dim">
+          <Sparkles size={14} /> Yükseltimler
+        </div>
+        <span className="text-[0.6rem] text-ink-dim italic">{available.length} mevcut</span>
       </div>
+
       <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1">
         {available.length === 0 && (
-          <p className="text-center text-ink-dim text-xs italic p-4">Daha fazla güç için ilerle...</p>
+          <p className="text-center text-ink-dim text-xs italic p-6 opacity-60">
+            ☠ Daha fazla güç için ilerle...
+          </p>
         )}
+
         {available.map(u => {
           const canAfford = se >= u.cost;
-          const tooltipText = `${u.name}\n\n${u.description}\nBedel: ${formatSE(u.cost)} SE`;
+          const tooltipText = `${u.name}\n\n${u.description}\n\nBedel: ${formatSE(u.cost)} SE`;
 
           return (
             <TooltipWrapper key={u.id} content={tooltipText}>
               <div
                 onClick={() => {
-                  if (canAfford) {
-                    soundManager.playBuy();
-                    buyUpgrade(u.id);
-                  }
+                  if (canAfford) { soundManager.playBuy(); buyUpgrade(u.id); }
                 }}
-                className={`px-3 py-2 rounded-sm border border-border border-l-2 transition-all duration-150 cursor-pointer w-full
-                            ${CATEGORY_COLOR[u.category] ?? 'border-l-border'}
-                            ${canAfford
-                              ? 'bg-surface hover:bg-surface-hover hover:border-r-gold hover:shadow-[2px_0_8px_rgba(212,175,55,0.2)]'
-                              : 'bg-surface opacity-40 cursor-not-allowed'}`}
+                className={[
+                  'flex items-center gap-2 px-3 py-2 rounded border border-border border-l-2 transition-all duration-150 cursor-pointer',
+                  CATEGORY_COLOR[u.category] ?? '',
+                  canAfford
+                    ? 'hover:brightness-110 hover:shadow-sm active:scale-[0.99]'
+                    : 'opacity-40 cursor-not-allowed',
+                ].join(' ')}
               >
-                <div className="flex justify-between items-baseline mb-1">
-                  <span className="font-cinzel text-[0.8rem] text-gold">{u.name}</span>
-                  <span className={`text-[0.65rem] ${canAfford ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {formatSE(u.cost)} SE
-                  </span>
-                </div>
-                <div className="text-[0.65rem] text-ink-dim leading-snug">
-                  {u.description}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 justify-between">
+                    <span className={`font-cinzel text-sm font-bold leading-tight ${CATEGORY_TEXT[u.category] ?? 'text-gold'}`}>
+                      {u.name}
+                    </span>
+                    <span className={`text-[0.7rem] font-bold flex-shrink-0 ${canAfford ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {formatSE(u.cost)} SE
+                    </span>
+                  </div>
+                  <p className="text-[0.65rem] text-ink-dim leading-snug mt-0.5 truncate">
+                    {u.description}
+                  </p>
                 </div>
               </div>
             </TooltipWrapper>
           );
         })}
-        {locked.map(u => (
-          <div key={u.id} className="px-3 py-2 rounded-sm border border-border opacity-25 cursor-default">
-            <div className="font-cinzel text-[0.82rem] text-gold">??? {u.category}</div>
-            <div className="text-[0.72rem] text-ink-dim">Kilit açmak için ilerle</div>
-          </div>
-        ))}
+
+        {/* Locked previews */}
+        {locked.length > 0 && (
+          <>
+            <div className="text-[0.6rem] text-ink-dim/40 uppercase tracking-widest text-center py-2 font-cinzel">
+              — kilitli —
+            </div>
+            {locked.map(u => (
+              <div key={u.id} className="flex items-center gap-2 px-3 py-2 rounded border border-border/30 opacity-20 cursor-default">
+                <div className="font-cinzel text-xs text-ink">??? {u.category}</div>
+                <div className="text-[0.6rem] text-ink-dim ml-auto">Kilit açmak için ilerle</div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

@@ -9,9 +9,9 @@ interface Props {
 }
 
 export default function ResourceBar({ onOpenWorlds, onOpenSettings }: Props) {
-  const se         = useGameStore(s => s.se);
+  const se          = useGameStore(s => s.se);
   const curseStones = useGameStore(s => s.curseStones);
-  const saveGame   = useGameStore(s => s.saveGame);
+  const saveGame    = useGameStore(s => s.saveGame);
   const [sePerSec, setSePerSec] = useState(0);
   const [saveAnim, setSaveAnim] = useState(false);
 
@@ -27,37 +27,88 @@ export default function ResourceBar({ onOpenWorlds, onOpenSettings }: Props) {
   };
 
   return (
-    <div className="relative z-10 flex flex-col md:flex-row items-center justify-center md:gap-8 px-2 md:px-6 py-2 md:py-3
-                    bg-gradient-to-b from-black/95 to-black/80 border-b border-border backdrop-blur-md">
-      
-      {/* Mobile Top Actions Row (Settings, Worlds, Save) */}
-      <div className="flex w-full md:hidden justify-between items-center mb-2 px-1">
-        <button onClick={onOpenWorlds} className="p-1.5 text-ink-dim hover:text-gold border border-border/50 rounded bg-black/40" aria-label="Bölgeler">
-          <Globe size={18} />
+    <div className="relative z-10 flex items-center bg-gradient-to-b from-black/95 to-black/85 border-b border-border backdrop-blur-md">
+
+      {/* Desktop actions (left) */}
+      <div className="hidden md:flex items-center gap-2 px-4 py-2 border-r border-border/30">
+        <button
+          onClick={onOpenWorlds}
+          className="flex items-center gap-1.5 font-cinzel text-[0.65rem] tracking-widest uppercase text-ink-dim border border-border/50 px-2.5 py-1.5 rounded hover:text-gold hover:border-gold/40 transition-all"
+        >
+          <Globe size={13} /> Bölgeler
         </button>
-        <button onClick={handleSave} className={`flex items-center gap-1.5 text-[0.65rem] font-cinzel px-3 py-1.5 border border-border/50 rounded bg-black/40 ${saveAnim ? 'text-emerald-400 border-emerald-500' : 'text-ink-dim'} transition-colors`}>
-          <Save size={14} className={saveAnim ? 'animate-bounce' : ''} />
-          {saveAnim ? 'KAYDEDİLDİ' : 'KAYDET'}
+        <button
+          onClick={handleSave}
+          className={`flex items-center gap-1.5 font-cinzel text-[0.65rem] tracking-widest uppercase border px-2.5 py-1.5 rounded transition-all ${
+            saveAnim ? 'text-emerald-400 border-emerald-500/50 bg-emerald-500/5' : 'text-ink-dim border-border/50 hover:text-ink hover:border-border'
+          }`}
+        >
+          <Save size={13} className={saveAnim ? 'animate-bounce' : ''} />
+          {saveAnim ? 'Kaydedildi' : 'Kaydet'}
         </button>
-        <button onClick={onOpenSettings} className="p-1.5 text-ink-dim hover:text-white border border-border/50 rounded bg-black/40" aria-label="Ayarlar">
-          <Settings size={18} />
+        <button
+          onClick={onOpenSettings}
+          className="p-1.5 rounded text-ink-dim border border-border/50 hover:text-white hover:border-border transition-all"
+          aria-label="Ayarlar"
+        >
+          <Settings size={14} />
         </button>
       </div>
 
-      {/* Resources */}
-      <div className="flex items-center justify-center gap-3 w-full md:w-auto">
-        <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-3">
-          <span className="font-cinzel text-[0.6rem] md:text-[0.75rem] tracking-[0.1em] md:tracking-[0.15em] uppercase text-ink-dim">Ruh Özü</span>
-          <span className="font-cinzel text-base md:text-lg font-bold text-gold text-shadow-gold leading-none">{formatSE(se)} SE</span>
-          <span className="text-[0.65rem] md:text-xs text-ink-dim italic leading-none">+{formatSE(sePerSec)}/sn</span>
+      {/* Mobile actions (left) */}
+      <div className="flex md:hidden items-center gap-2 px-2 py-2">
+        <button onClick={onOpenWorlds} className="p-1.5 text-ink-dim border border-border/40 rounded" aria-label="Bölgeler">
+          <Globe size={16} />
+        </button>
+        <button onClick={onOpenSettings} className="p-1.5 text-ink-dim border border-border/40 rounded" aria-label="Ayarlar">
+          <Settings size={16} />
+        </button>
+      </div>
+
+      {/* Center — Resources */}
+      <div className="flex-1 flex items-center justify-center gap-8 md:gap-16 py-2 px-4">
+        {/* SE */}
+        <div className="flex flex-col items-center">
+          <span className="font-cinzel text-[0.55rem] md:text-[0.65rem] tracking-[0.25em] uppercase text-gold-dim font-bold">
+            Ruh Özü
+          </span>
+          <span className="font-cinzel text-xl md:text-3xl font-black text-gold leading-none">
+            {formatSE(se)}
+            <span className="text-sm md:text-base opacity-40 ml-1 font-bold">SE</span>
+          </span>
+          <span className="text-[0.6rem] md:text-[0.7rem] text-emerald-400 font-semibold leading-none">
+            +{formatSE(sePerSec)}/sn
+          </span>
         </div>
 
-        <span className="text-sm md:text-xl text-ink-dim opacity-40 mx-2">☠</span>
+        <span className="text-white/10 text-2xl hidden sm:inline">☠</span>
 
-        <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-3">
-          <span className="font-cinzel text-[0.6rem] md:text-[0.75rem] tracking-[0.1em] md:tracking-[0.15em] uppercase text-ink-dim">Lanet Taşı</span>
-          <span className="font-cinzel text-base md:text-lg font-bold text-void leading-none">{curseStones} 💎</span>
+        {/* Curse Stones */}
+        <div className="flex flex-col items-center">
+          <span className="font-cinzel text-[0.55rem] md:text-[0.65rem] tracking-[0.25em] uppercase text-void font-bold opacity-70">
+            Lanet Taşı
+          </span>
+          <span className="font-cinzel text-xl md:text-3xl font-black text-void leading-none">
+            {curseStones}
+            <span className="text-sm md:text-base opacity-40 ml-1">💎</span>
+          </span>
         </div>
+      </div>
+
+      {/* Desktop Save (right) - hidden, already top left */}
+      <div className="hidden md:flex items-center px-4 py-2 border-l border-border/30">
+        <span className="text-[0.55rem] text-ink-dim/40 italic font-cinzel">auto-save: 30s</span>
+      </div>
+
+      {/* Mobile Save */}
+      <div className="flex md:hidden items-center px-2">
+        <button
+          onClick={handleSave}
+          className={`p-1.5 rounded border transition-all ${saveAnim ? 'text-emerald-400 border-emerald-500/50' : 'text-ink-dim border-border/40'}`}
+          aria-label="Kaydet"
+        >
+          <Save size={16} className={saveAnim ? 'animate-bounce' : ''} />
+        </button>
       </div>
     </div>
   );

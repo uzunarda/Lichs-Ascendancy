@@ -19,9 +19,9 @@ export default function PrestigePanel() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex items-center gap-2 font-cinzel text-[0.7rem] tracking-[0.2em] uppercase text-gold-dim
+      <div className="flex items-center gap-2 font-cinzel text-[0.75rem] tracking-[0.2em] uppercase text-blood-light
                       px-4 py-3 border-b border-border bg-black/30">
-        <Skull size={16} /> ÖLÜM DÖNGÜSÜ
+        <Skull size={18} /> ÖLÜM DÖNGÜSÜ
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
@@ -80,7 +80,7 @@ export default function PrestigePanel() {
                                 ${state === 'available' ? 'border-void/40 bg-surface hover:bg-surface-hover hover:border-void/70 cursor-pointer' : ''}
                                 ${state === 'locked'    ? 'border-border bg-surface opacity-40 cursor-not-allowed' : ''}`}
                   >
-                    <span className="font-cinzel text-[0.7rem] text-gold">
+                    <span className="font-cinzel text-[0.75rem] text-void-light">
                       {p.purchased ? '✓ ' : ''}{p.name}
                     </span>
                     <span className={`flex items-center gap-1 font-cinzel text-[0.7rem] row-span-2 self-center text-right

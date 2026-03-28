@@ -5,17 +5,29 @@ import { soundManager } from '../systems/soundManager';
 import TooltipWrapper from './TooltipWrapper';
 import { Pickaxe, Swords, Ghost, Droplets, Flame, Orbit, Sparkles } from 'lucide-react';
 
+const TIER_COLORS = [
+  'text-amber-400 bg-amber-900/30 border-amber-700/30',
+  'text-red-400 bg-red-900/30 border-red-700/30',
+  'text-purple-400 bg-purple-900/30 border-purple-700/30',
+  'text-blue-400 bg-blue-900/30 border-blue-700/30',
+  'text-orange-400 bg-orange-900/30 border-orange-700/30',
+  'text-cyan-400 bg-cyan-900/30 border-cyan-700/30',
+  'text-pink-400 bg-pink-900/30 border-pink-700/30',
+];
+
 const getIconForTier = (tier: number) => {
+  const cls = 'w-5 h-5';
   switch (tier) {
-    case 1: return <Pickaxe size={24} />;
-    case 2: return <Swords size={24} />;
-    case 3: return <Ghost size={24} />;
-    case 4: return <Droplets size={24} />;
-    case 5: return <Flame size={24} />;
-    case 6: return <Orbit size={24} />;
-    default: return <Sparkles size={24} />;
+    case 1: return <Pickaxe className={cls} />;
+    case 2: return <Swords className={cls} />;
+    case 3: return <Ghost className={cls} />;
+    case 4: return <Droplets className={cls} />;
+    case 5: return <Flame className={cls} />;
+    case 6: return <Orbit className={cls} />;
+    default: return <Sparkles className={cls} />;
   }
 };
+
 export default function HelperPanel() {
   const helpers   = useGameStore(s => s.helpers);
   const se        = useGameStore(s => s.se);
@@ -23,18 +35,33 @@ export default function HelperPanel() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex items-center gap-2 font-cinzel text-[0.85rem] tracking-[0.2em] uppercase text-gold-dim
-                      px-4 py-3 border-b border-border bg-black/30">
-        <Swords size={18} /> ORDU
+      {/* Panel Header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-black/40">
+        <div className="flex items-center gap-2 font-cinzel text-xs tracking-[0.25em] uppercase text-gold-dim">
+          <Swords size={14} /> Ordu
+        </div>
+        <span className="text-[0.6rem] text-ink-dim italic">tıkla → satın al</span>
       </div>
-      <div className="flex-1 overflow-y-auto scrollbar-thin p-2 flex flex-col gap-1">
-        {HELPERS.map(h => {
-          const count = helpers[h.id] || 0;
-          const cost = calcHelperCost(h.baseCost, count);
+
+      {/* Units List */}
+      <div className="flex-1 overflow-y-auto">
+        {HELPERS.map((h, idx) => {
+          const count     = helpers[h.id] || 0;
+          const cost      = calcHelperCost(h.baseCost, count);
           const canAfford = se >= cost;
-          const pct = ((count % 10) / 10) * 100;
-          
-          const tooltipText = `${h.name}\n\nSE/sn: +${formatSE(h.baseSEperSec)}\nSahip Olunan: ${count}`;
+          const pct       = ((count % 10) / 10) * 100;
+          const tierColor = TIER_COLORS[(h.tier - 1) % TIER_COLORS.length];
+          const contribution = count > 0 ? calcHelperContribution(h.id) : 0;
+
+          const tooltipText = [
+            h.name,
+            '',
+            h.description,
+            '',
+            `Maliyet: ${formatSE(cost)} SE`,
+            count > 0 ? `Katkı: +${formatSE(contribution)} SE/sn` : 'Henüz alınmadı',
+            `Sonraki bonus: ${10 - (count % 10)} adet sonra`,
+          ].join('\n');
 
           return (
             <TooltipWrapper key={h.id} content={tooltipText}>
@@ -45,39 +72,58 @@ export default function HelperPanel() {
                     buyHelper(h.id);
                   }
                 }}
-                className={`grid grid-cols-[2rem_1fr_auto] gap-2 items-center
-                            px-3 py-2.5 rounded-md border transition-all duration-150 cursor-pointer w-full
-                            ${canAfford
-                              ? 'bg-surface border-border hover:bg-surface-hover hover:border-gold hover:shadow-gold'
-                              : 'bg-surface border-border opacity-40 cursor-not-allowed'}`}
+                className={[
+                  'flex items-center gap-3 px-3 py-2.5 border-b border-border/40',
+                  'transition-colors duration-100 select-none relative',
+                  canAfford
+                    ? 'cursor-pointer hover:bg-white/[0.04] active:bg-gold/[0.06]'
+                    : 'cursor-not-allowed opacity-40',
+                  idx % 2 === 0 ? 'bg-black/10' : 'bg-black/20',
+                ].join(' ')}
               >
-                <div className="flex items-center justify-center w-8 h-8 text-gold">
+                {/* Tier Icon */}
+                <div className={`flex-shrink-0 w-9 h-9 flex items-center justify-center rounded border ${tierColor}`}>
                   {getIconForTier(h.tier)}
                 </div>
 
-                <div className="min-w-0">
-                  <div className="font-cinzel text-[0.82rem] text-gold leading-tight truncate">{h.name}</div>
-                  <div className="flex flex-col gap-0.5 mt-0.5">
-                    <span className="text-[0.65rem] text-ink-dim truncate">{h.description}</span>
+                {/* Name + Description + Progress */}
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-cinzel text-sm font-bold text-ink leading-none truncate">
+                      {h.name}
+                    </span>
                     {count > 0 && (
-                      <span className="text-[0.60rem] font-bold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-sm w-max">
-                        +{formatSE(calcHelperContribution(h.id))} SE/sn
+                      <span className="text-[0.6rem] text-emerald-400 font-medium whitespace-nowrap">
+                        +{formatSE(contribution)}/sn
                       </span>
                     )}
                   </div>
+                  <span className="text-[0.65rem] text-ink-dim leading-tight mt-0.5 truncate">
+                    {h.description}
+                  </span>
+
+                  {/* Progress bar towards next milestone */}
+                  {count > 0 && (
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-gold/50 to-gold rounded-full transition-all duration-500"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-[0.55rem] text-ink-dim whitespace-nowrap">{count % 10}/10</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-col items-end justify-center min-w-[3.5rem] text-right">
-                  <span className="font-cinzel font-bold text-[0.8rem] text-gold">{count}</span>
-                  <span className={`text-[0.65rem] ${canAfford ? 'text-emerald-400' : 'text-red-400'}`}>
+                {/* Cost + Count */}
+                <div className="flex-shrink-0 flex flex-col items-end justify-center gap-0.5 min-w-[4rem]">
+                  <span className="font-cinzel font-black text-2xl text-white/30 leading-none">
+                    {count}
+                  </span>
+                  <span className={`text-[0.7rem] font-bold leading-none ${canAfford ? 'text-emerald-400' : 'text-red-400'}`}>
                     {formatSE(cost)} SE
                   </span>
-                  <div className="relative h-0.5 w-full bg-white/10 rounded mt-1 overflow-visible">
-                    <div className="h-full bg-gold rounded transition-all duration-300" style={{ width: `${pct}%` }} />
-                    <span className="absolute -top-3.5 right-0 text-[0.55rem] text-ink-dim whitespace-nowrap">
-                      {count % 10}/10
-                    </span>
-                  </div>
                 </div>
               </div>
             </TooltipWrapper>
