@@ -13,28 +13,29 @@
 
 ## ═══ V2 — KARANLIĞIN ŞAFAĞI ═══
 
-### FAZ 7 — Yeni Bölgeler ⏱ 2–3 hafta
+### FAZ 7 — Yeni Bölgeler ⏱ 2–3 hafta ✅ TAMAMLANDI
 
-- [ ] 5 yeni bölge (Bölge 7–11) — CSS atmosfer + gradient
-  - [ ] Ebedi Donmuş Bozkır — Buzul helper'ları, Donma Ritüeli
-  - [ ] Uçurum Şehri — Uçurum Tüccarı, Kule Yapıları
-  - [ ] Rüya Kırıkları — Rüya Parçası kaynağı, Rüya Ritüeli
-  - [ ] Yokluğun Kalbi — Yokluk Dalgaları, Boss spawn
-  - [ ] Başlangıcın Sonu — True Endgame, sonsuz döngü modu
-- [ ] Yeni kaynaklar: Dondurulmuş Ruh Özü (FSE), Rüya Parçası (DP), Yokluk Tozu (VT)
-- [ ] 3 yeni Helper tier'ı (Void Gezgini, Uçurum Mimarı, Yok Olmuş Tanrı)
-- [ ] `RegionMap.tsx` güncellenmesi (11 bölge)
+- [x] 5 yeni bölge (Bölge 7–11) — CSS atmosfer + gradient
+  - [x] Ebedi Donmuş Bozkır — Buz mavisi atmosfer, kar hissi
+  - [x] Uçurum Şehri — Derin mor-gri, uçurum kenarı atmosferi
+  - [x] Rüya Kırıkları — Pastel mor, kırık cam efekti
+  - [x] Yokluğun Kalbi — Saf siyah yokluk, darbeli dalgalar
+  - [x] Başlangıcın Sonu — True Endgame, sonsuz döngü modu
+- [/] Yeni kaynaklar: FSE/DP/VT tip tanımları hazır, store entegrasyonu Faz 8'de
+- [x] 3 yeni Helper tier'ı — Void Gezgini (T7), Uçurum Mimarı (T8), Yok Olmuş Tanrı (T9)
+- [x] 6 yeni yükseltim eklendi (yokluk + mimar + tanrı + sinerji + passive + ritüel)
+- [x] `RegionMap.tsx` güncellendi — 11 bölge, emoji ikonlar, V2 badge, per-region progress bar
 
 ---
 
-### FAZ 8 — Hane Sistemi (Yapı İnşası) ⏱ 3–4 hafta
+### FAZ 8 — Hane Sistemi (Yapı İnşası) ⏱ 3–4 hafta ✅ TAMAMLANDI
 
-- [ ] `buildingStore.ts` — yeni Zustand store
-- [ ] 8 yapı tipi (Ruh Çukuru → Ebediyet Tahtı)
-- [ ] İnşaat timer sistemi (tick-based, `completesAt` timestamp)
-- [ ] Bölge başına maks 5 slot (+2 prestige ile)
-- [ ] Yapı sinerji sistemi (4 sinerji kombinasyonu)
-- [ ] `BuildingPanel.tsx` UI bileşeni
+- [x] `buildingStore.ts` — Zustand store, tick-based inşaat, sinerji hesaplama, SE/click bonus, save/load
+- [x] 8 yapı tipi (Ruh Çukuru → Ebediyet Tahtı) — `buildingData.ts`
+- [x] İnşaat timer sistemi (tick-based, `completesAt` timestamp)
+- [x] Bölge başına maks 5 slot (+2 prestige, +1 yapı bazlı unlock)
+- [x] 4 sinerji kombinasyonu (Karanlık Temel, Ritüel Yakınsama, Kabus Düzeni, Yokluk Sonsuzluğu)
+- [x] `BuildingPanel.tsx` — 3 sekmeli UI (İnşa Et / Aktif / Sinerji), kategori renkleri, progress bar
 
 ---
 
@@ -186,7 +187,8 @@
 | Versiyon | Faz | Durum |
 |----------|-----|-------|
 | V1 | Faz 1–6 (Core, Ritual, Prestige, Polish) | ✅ Tamamlandı |
-| V2 | Faz 7–13 | 🔴 Başlanmadı |
+| V2 | Faz 7 (Yeni 5 Bölge + Yeni Helper Tierları) | ✅ Tamamlandı |
+| V2 | Faz 8–13 | 🔴 Başlanmadı |
 | V3 | Faz 14–22 | 🔴 Başlanmadı |
 
 > **Sonraki Öncelikli Adımlar:**

@@ -50,12 +50,12 @@ export default function RitualPanel() {
                                 ? 'bg-surface border-void/20 hover:bg-surface-hover hover:border-void/50 cursor-pointer'
                                 : 'bg-surface border-border opacity-40 cursor-not-allowed'}`}
                 >
-                  <span className="font-cinzel text-[0.82rem] text-void-light font-bold">
+                  <span className="font-cinzel text-sm text-void font-bold leading-tight">
                     {r.name}
                   </span>
-                  <span className="text-[0.75rem] text-ink-dim">{formatSE(r.seCost)} SE</span>
-                  <span className="text-[0.72rem] text-ink-dim">%{Math.round(r.successChance * 100)} şans</span>
-                  <span className="text-[0.72rem] text-void italic">{r.reward}</span>
+                  <span className="text-xs text-ink-dim font-medium">{formatSE(r.seCost)} SE</span>
+                  <span className="text-xs text-ink-dim">%{Math.round(r.successChance * 100)} şans</span>
+                  <span className="text-xs text-void italic leading-tight">{r.reward}</span>
                 </button>
               </TooltipWrapper>
             );

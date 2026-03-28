@@ -55,6 +55,34 @@ export const HELPERS: HelperData[] = [
     description: 'Prestige sırasında gelirin %5\'ini prestige para birimine dönüştürür.',
     special: 'Prestige bonus',
   },
+  // --- FAZ 7: Yeni Helper Tier'ları ---
+  {
+    id: 'void_wanderer',
+    name: 'Yokluk Gezgini',
+    tier: 7,
+    baseSEperSec: 85000,
+    baseCost: 12000000,
+    description: 'Ruh Özü akışını sürekli yeniden düzenler; her tick\'te %0.5 bonus üretim şansı.',
+    special: 'Bonus tick şansı',
+  },
+  {
+    id: 'abyss_architect',
+    name: 'Uçurum Mimarı',
+    tier: 8,
+    baseSEperSec: 720000,
+    baseCost: 140000000,
+    description: 'Diğer helper\'ların gelişim çubuğunu iki kat hızla doldurur.',
+    special: 'Hızlandırılmış milestone',
+  },
+  {
+    id: 'obliterated_god',
+    name: 'Yok Olmuş Tanrı',
+    tier: 9,
+    baseSEperSec: 6500000,
+    baseCost: 2000000000,
+    description: 'Her 100 saniyede bir tüm üretimi 10 saniyleğine katlar.',
+    special: 'Periyodik üretim patla ması',
+  },
 ];
 
 export const RITUALS: RitualData[] = [
@@ -139,10 +167,51 @@ export const REGIONS: RegionData[] = [
   {
     id: 'death_throne',
     name: 'Ölüm Tahtı',
-    seThreshold: Infinity,
+    seThreshold: 200000000000,
     atmosphere: 'Altın & mor, kayan yıldızlar, sessizlik',
     color: '#d4af37',
     bgGradient: 'radial-gradient(ellipse at 50% 100%, #1a1000 0%, #0d0800 60%, #050300 100%)',
+  },
+  // --- FAZ 7: 5 Yeni Bölge ---
+  {
+    id: 'frozen_steppe',
+    name: 'Ebedi Donmuş Bozkir',
+    seThreshold: 2000000000000,
+    atmosphere: 'Buz mavisi, donmuş efektler, rüzgar sesi, kar taneleri',
+    color: '#7dd3fc',
+    bgGradient: 'radial-gradient(ellipse at 50% 0%, #001830 0%, #000c1a 50%, #000408 100%)',
+  },
+  {
+    id: 'abyss_city',
+    name: 'Uçurum Şehri',
+    seThreshold: 25000000000000,
+    atmosphere: 'Derin gri-mor, uçurum kenarı, uzak çığlıklar',
+    color: '#8b5cf6',
+    bgGradient: 'radial-gradient(ellipse at 50% 100%, #0d0520 0%, #060010 55%, #010005 100%)',
+  },
+  {
+    id: 'dream_shards',
+    name: 'Rüya Kırıkları',
+    seThreshold: 350000000000000,
+    atmosphere: 'Parıldayan kırık cam efekti, pastel rüzyarlar, rüya çanı sesi',
+    color: '#f0abfc',
+    bgGradient: 'radial-gradient(ellipse at 30% 40%, #1a0a1e 0%, #0d0118 50%, #030007 100%)',
+  },
+  {
+    id: 'void_heart',
+    name: 'Yokluğun Kalbi',
+    seThreshold: 5000000000000000,
+    atmosphere: 'Siyah boşluk, darbeli yokluk dalgaları, derin uğultu',
+    color: '#1e1b4b',
+    bgGradient: 'radial-gradient(ellipse at 50% 50%, #050014 0%, #020009 60%, #000003 100%)',
+  },
+  {
+    id: 'beginning_end',
+    name: 'Başlangıcın Sonu',
+    seThreshold: Infinity,
+    atmosphere: 'Saf beyaz ve siyah, sonsuz döngü, monark müzik',
+    color: '#ffffff',
+    bgGradient: 'radial-gradient(ellipse at 50% 50%, #101010 0%, #050505 60%, #000000 100%)',
   },
 ];
 
@@ -165,6 +234,13 @@ export const UPGRADES: UpgradeData[] = [
   { id: 'synergy_night_lord', name: 'Gece Efendisi', category: 'synergy', cost: 50000, description: 'Vampir Ajanlar hiç uyumaz', effect: 'vampire_no_sleep', unlockCondition: 'vampire_agent>=5&&lich_apprentice>=3', purchased: false },
   { id: 'ritual_time_1', name: 'Uzun Ritüel', category: 'ritual', cost: 2500, description: 'Ritüel süresi +5 sn', effect: 'ritualDuration+5', unlockCondition: 'se>=1000', purchased: false },
   { id: 'ritual_chance_1', name: 'Şanslı Kan', category: 'ritual', cost: 7500, description: 'Ritüel başarı şansı +%10', effect: 'ritualChance+0.1', unlockCondition: 'se>=5000', purchased: false },
+  // --- FAZ 7: Yeni tier yükseltimleri ---
+  { id: 'helper_void_1', name: 'Yokluk Harmonisi', category: 'helper', cost: 60000000, description: 'Yokluk Gezgini SE/sn x2', effect: 'void_wanderer*2', unlockCondition: 'void_wanderer>=10', purchased: false },
+  { id: 'helper_abyss_1', name: 'Derin Mimar', category: 'helper', cost: 700000000, description: 'Uçurum Mimarı SE/sn x2', effect: 'abyss_architect*2', unlockCondition: 'abyss_architect>=10', purchased: false },
+  { id: 'helper_god_1', name: 'Yok Olmuş Evrim', category: 'helper', cost: 10000000000, description: 'Yok Olmuş Tanrı SE/sn x2', effect: 'obliterated_god*2', unlockCondition: 'obliterated_god>=10', purchased: false },
+  { id: 'synergy_void_realm', name: 'Yokluk Paktı', category: 'synergy', cost: 500000000, description: 'Gezgin + Mimar birlikte üretimi x1.5', effect: 'void_synergy*1.5', unlockCondition: 'void_wanderer>=5&&abyss_architect>=3', purchased: false },
+  { id: 'passive_frozen_soul', name: 'Donmuş Ruh', category: 'passive', cost: 2000000000, description: 'Offline birikim 8s → 16s', effect: 'offlineMax*2', unlockCondition: 'se>=2000000000000', purchased: false },
+  { id: 'ritual_dream_1', name: 'Rüya Ritüeli', category: 'ritual', cost: 500000000000, description: 'Ritüel başarı şansı +%25', effect: 'ritualChance+0.25', unlockCondition: 'se>=350000000000000', purchased: false },
 ];
 
 export const FRENZY_CLICKS_REQUIRED = 50;

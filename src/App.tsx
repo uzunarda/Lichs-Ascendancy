@@ -1,26 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from './store/gameStore';
+import { useBuildingStore } from './store/buildingStore';
 import { REGIONS } from './data/gameData';
-import ResourceBar   from './components/ResourceBar';
+import ResourceBar    from './components/ResourceBar';
 import LichSkull     from './components/LichSkull';
 import RitualPanel   from './components/RitualPanel';
 import HelperPanel   from './components/HelperPanel';
 import UpgradePanel  from './components/UpgradePanel';
 import RegionMap     from './components/RegionMap';
 import PrestigePanel from './components/PrestigePanel';
+import BuildingPanel from './components/BuildingPanel';
 import NotificationManager from './components/NotificationManager';
 import WorldsModal   from './components/WorldsModal';
 import SettingsModal from './components/SettingsModal';
 import BottomNavbar  from './components/BottomNavbar';
 import './index.css';
 import './styles/animation.css';
-type TabId = 'main' | 'army' | 'upgrades' | 'prestige';
+type TabId = 'main' | 'army' | 'upgrades' | 'buildings' | 'prestige';
 
 const TABS: { id: TabId; icon: string; label: string }[] = [
-  { id: 'main',     icon: '☠',  label: 'Taht' },
-  { id: 'army',     icon: '⚔',  label: 'Ordu' },
-  { id: 'upgrades', icon: '✦',  label: 'Güç' },
-  { id: 'prestige', icon: '💀', label: 'Döngü' },
+  { id: 'main',      icon: '☠',  label: 'Taht' },
+  { id: 'army',      icon: '⚔',  label: 'Ordu' },
+  { id: 'upgrades',  icon: '✦',  label: 'Güç' },
+  { id: 'buildings', icon: '🏙', label: 'Hane' },
+  { id: 'prestige',  icon: '💀', label: 'Döngü' },
 ];
 
 export default function App() {
@@ -32,10 +35,11 @@ export default function App() {
   const lastSaved      = useGameStore(s => s.lastSaveTime);
 
   const [activeTab, setActiveTab]   = useState<TabId>('main');
-  const [panelTab, setPanelTab]     = useState<'helpers' | 'prestige'>('helpers');
+  const [panelTab, setPanelTab]     = useState<'helpers' | 'buildings' | 'prestige'>('helpers');
   const [offlineMsg, setOfflineMsg] = useState<string | null>(null);
   const [isWorldsModalOpen, setWorldsModalOpen] = useState(false);
   const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
+  const tickBuildings = useBuildingStore(s => s.tickBuildings);
 
   const tickRef = useRef(tick);
   tickRef.current = tick;
@@ -61,6 +65,7 @@ export default function App() {
     const id = setInterval(() => {
       const now = Date.now();
       tickRef.current((now - last) / 1000);
+      tickBuildings(now);
       last = now;
     }, 100);
     return () => clearInterval(id);
@@ -127,21 +132,22 @@ export default function App() {
         
         <aside className="flex flex-col border-l border-border bg-black/75 backdrop-blur-sm overflow-hidden">
           <div className="flex border-b border-border bg-black/40">
-            {(['helpers', 'prestige'] as const).map(t => (
+            {(['helpers', 'buildings', 'prestige'] as const).map(t => (
               <button
                 key={t}
                 onClick={() => setPanelTab(t)}
-                className={`flex-1 py-2.5 font-cinzel text-[0.8rem] tracking-widest uppercase transition-colors
+                className={`flex-1 py-2 font-cinzel text-xs tracking-widest uppercase transition-colors
                   ${panelTab === t
                     ? 'text-gold border-b-2 border-gold bg-gold/5'
                     : 'text-ink-dim hover:text-ink hover:bg-white/[0.03]'}`}
               >
-                {t === 'helpers' ? 'Ordu' : 'Prestige'}
+                {t === 'helpers' ? 'Ordu' : t === 'buildings' ? 'Hane' : 'Prestige'}
               </button>
             ))}
           </div>
-          {panelTab === 'helpers'  && <HelperPanel />}
-          {panelTab === 'prestige' && <PrestigePanel />}
+          {panelTab === 'helpers'   && <HelperPanel />}
+          {panelTab === 'buildings' && <BuildingPanel />}
+          {panelTab === 'prestige'  && <PrestigePanel />}
         </aside>
       </div>
 
@@ -159,8 +165,9 @@ export default function App() {
               <HelperPanel />
             </div>
           )}
-          {activeTab === 'upgrades' && <UpgradePanel />}
-          {activeTab === 'prestige' && <PrestigePanel />}
+          {activeTab === 'upgrades'  && <UpgradePanel />}
+          {activeTab === 'buildings' && <BuildingPanel />}
+          {activeTab === 'prestige'  && <PrestigePanel />}
         </div>
 
         <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16

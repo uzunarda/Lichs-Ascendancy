@@ -50,3 +50,31 @@ export interface PrestigePower {
   description: string;
   purchased: boolean;
 }
+
+// ─── Phase 8: Building System ───────────────────────────────────────────────
+
+export type BuildingCategory = 'soul' | 'ritual' | 'military' | 'prestige';
+
+export interface BuildingData {
+  id: string;
+  name: string;
+  category: BuildingCategory;
+  cost: number;           // SE cost to construct
+  buildTimeSec: number;   // construction duration in seconds
+  description: string;
+  effect: string;         // human-readable effect
+  sePerSecBonus?: number; // flat SE/s bonus on completion
+  clickBonus?: number;    // multiplier on click power
+  slotUnlock?: boolean;   // unlocks +1 building slot in the region
+  synergyWith?: string[]; // IDs of buildings this synergizes with
+  requiresRegion?: number; // minimum region index required
+}
+
+export interface BuildingInstance {
+  id: string;           // buildingData id
+  instanceId: string;   // unique per placed building
+  startedAt: number;    // timestamp
+  completesAt: number;  // timestamp
+  completed: boolean;
+}
+
