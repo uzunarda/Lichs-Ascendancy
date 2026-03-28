@@ -7,95 +7,7 @@
 
 ## ═══ V1 — CORE OYUN (Web Edition) ═══
 
-### FAZ 1 — Prototype ⏱ 1–2 hafta
-
-- [x] Vite + React 18 + TypeScript + Zustand proje kurulumu
-- [x] `gameStore.ts` ile merkezi state yönetimi
-- [x] Tıklama sistemi — Lich kafatası ikonu, SE kazanımı (`LichSkull.tsx`)
-- [x] Frenzy Combo — 10 sn'de 50 tıklama → SE x3 (5 sn)
-- [x] İlk 3 Helper tanımı (İskelet İşçi, Zombi Hasat Edici, Vampir Ajan)
-- [x] Helper satın alma & maliyet formülü (`cost(n) = baseCost × 1.15^n`)
-- [x] Milestone bonus sistemi (`totalRate × 1.15^floor(count/10)`)
-- [x] Temel UI düzeni — ResourceBar, LichSkull, HelperPanel
-- [x] Sayı formatlama (K / M / B / bilimsel notasyon) (`numberUtils.ts`)
-- [x] `index.css` — dark fantasy renk paleti, Cinzel + Crimson Pro fontları
-
----
-
-### FAZ 2 — Core Loop ⏱ 2–3 hafta
-
-- [x] 6 Helper'ın tamamı (İskelet İşçi → Karanlık Yarı-Tanrı) tanımlı & çalışıyor
-- [x] Upgrade sistemi — Click, Helper, Synergy kategorileri (`UpgradePanel.tsx`)
-  - [x] Click Upgrades (3 adet: x2, x3, x5)
-  - [x] Helper Upgrades (İskelet İşçi x2, Zombi Hasat Edici x2)
-  - [x] Synergy Upgrades (Kemik Ordusu, Gece Efendisi)
-  - [ ] Ritual Upgrades (ritüel başarı şansı & ödül artışı)
-  - [ ] Passive Upgrades (offline kazanım süresi uzatma — prestige para birimiyle)
-- [x] Save/Load sistemi — `localStorage` ile JSON kayıt
-- [ ] Save hash doğrulama (cheating önlemi)
-- [x] Otomatik kayıt (30 sn interval + beforeunload)
-
----
-
-### FAZ 3 — Ritual & Bölge ⏱ 2–3 hafta
-
-- [x] Ritüel sistemi — 4 tier (Küçük, Orta, Büyük, Kâbus) (`RitualPanel.tsx`)
-- [x] Ritüel cooldown (60–120 sn arası rastgele)
-- [x] Lich Çırağı: her birim ritüel başarı şansını +%5 artırıyor
-- [x] 6 bölge tanımı — SE eşiği, CSS renk, gradient arka plan (`gameData.ts`)
-- [x] Bölge geçişleri — totalSE bazlı otomatik ilerleme
-- [x] CSS atmosfer geçişleri — `transition-all duration-[2000ms]`
-- [x] Bölge haritası UI (`RegionMap.tsx`)
-
----
-
-### FAZ 4 — Prestige ⏱ 2–3 hafta
-
-- [x] Ölüm Döngüsü prestige mekaniği
-- [x] Lanet Taşı kazanım formülü — `floor(sqrt(totalSE / 1,000,000))`
-- [x] Prestige mağazası — 6 kalıcı güç (`PrestigePanel.tsx`)
-  - [x] Kemik Zırhı (ClickPower +%10)
-  - [x] Gece Görüşü (Offline 8s → 12s) — tanımlandı ama efekt tam uygulanmamış olabilir
-  - [x] Ruh Toplayıcı (Başlangıç SE x10)
-  - [x] Vampirik Kucaklama (Vampir uyumaz)
-  - [x] Ölümsüz Beden (Tüm üretim x1.25)
-  - [x] Lanetli Taht (Yeni bölge açar)
-- [x] Prestige'de SE, helper, upgrade sıfırlanıyor; Lanet Taşları kalıcı
-- [x] Offline progress — maks 8 saat birikim, açılışta toast bildirimi
-- [x] Karanlık Yarı-Tanrı Prestige bonusu (%5 ekstra taş)
-
----
-
-### FAZ 5 — Ses & Sanat ⏱ 2–3 hafta
-
-- [ ] Howler.js entegrasyonu
-- [ ] Tıklama sesi (kemik crack)
-- [ ] Frenzy aktif sesi (davul + korku teli)
-- [ ] Helper satın alma sesi (zincir çıkartma)
-- [ ] Ritüel açma / başarı / başarısızlık sesleri
-- [ ] Prestige sesi
-- [ ] Bölge geçiş ses fadeout/fade-in
-- [ ] SVG sprite asset'leri (helper ikonları, UI öğeleri)
-- [x] CSS animasyonlar (`animation.css` — glow-pulse, frenzy-pulse, particle-float, vb.)
-- [ ] Ruh parçacık efektleri tıklamada
-
----
-
-### FAZ 6 — QA & Yayın ⏱ 1–2 hafta
-
-- [ ] Kapsamlı bug testi (tüm mekanikler)
-- [ ] Balans ayarları (helper fiyatları, ritüel şansları, prestige eğrisi)
-- [ ] Tooltip sistemi tüm elementlere uygulanması
-  - [x] `TooltipWrapper.tsx` bileşeni mevcut
-  - [ ] Tüm interaktif öğelere uygulanması
-- [ ] Notification / Badge animasyon sistemi (milestone bildirim)
-- [ ] Erişilebilirlik
-  - [ ] Renk körü modu (sembollerle destekleme)
-  - [ ] Font boyutu ayarı (CSS variable)
-  - [ ] Klavye desteği (Space = tıklama, Tab navigasyonu)
-- [ ] itch.io sayfa tasarımı
-- [ ] Vercel / GitHub Pages deploy
-- [ ] Production build optimizasyonu
+> **Tamamlandı.** İlk 6 Faz (Prototype, Core Loop, Ritual & Bölge, Prestige, Ses & Sanat, QA & Yayın) başarıyla uygulandı ve proje V1 sürümüne ulaştı.
 
 ---
 
@@ -273,17 +185,11 @@
 
 | Versiyon | Faz | Durum |
 |----------|-----|-------|
-| V1 | Faz 1 — Prototype | ✅ Tamamlandı |
-| V1 | Faz 2 — Core Loop | 🟡 %85 (Ritual/Passive upgrade eksik) |
-| V1 | Faz 3 — Ritual & Bölge | ✅ Tamamlandı |
-| V1 | Faz 4 — Prestige | ✅ Tamamlandı |
-| V1 | Faz 5 — Ses & Sanat | 🔴 %10 (Sadece CSS animasyonlar) |
-| V1 | Faz 6 — QA & Yayın | 🔴 %5 (TooltipWrapper mevcut) |
+| V1 | Faz 1–6 (Core, Ritual, Prestige, Polish) | ✅ Tamamlandı |
 | V2 | Faz 7–13 | 🔴 Başlanmadı |
 | V3 | Faz 14–22 | 🔴 Başlanmadı |
 
 > **Sonraki Öncelikli Adımlar:**
-> 1. Faz 2'deki eksik upgrade'leri tamamla (Ritual + Passive)
-> 2. Save hash doğrulaması ekle
-> 3. Faz 5 — Ses sistemi (Howler.js)
-> 4. Faz 6 — Tooltip yaygınlaştırma, erişilebilirlik, deploy
+> 1. V2 mimarisine geçiş ve Faz 7 geliştirmesi (Yeni 5 Bölge).
+> 2. Yeni kaynaklar (FSE, DP, VT) ve 3 yeni Helper tier'ı.
+> 3. Hane Sistemi altyapısı (`buildingStore.ts`) ve inşaat objeleri.

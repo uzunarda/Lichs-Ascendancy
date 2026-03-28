@@ -107,7 +107,7 @@ export const REGIONS: RegionData[] = [
   {
     id: 'cursed_forest',
     name: 'Lanetli Orman',
-    seThreshold: 10000,
+    seThreshold: 50000,
     atmosphere: 'Derin mor, titreyen yapraklar, rüzgar sesi',
     color: '#7c4a9e',
     bgGradient: 'radial-gradient(ellipse at 50% 100%, #1a0a2e 0%, #0d0518 60%, #03010a 100%)',
@@ -115,7 +115,7 @@ export const REGIONS: RegionData[] = [
   {
     id: 'abandoned_castle',
     name: 'Terk Edilmiş Kale',
-    seThreshold: 500000,
+    seThreshold: 1500000,
     atmosphere: 'Taş gri, alev parçacıkları, uzak zincir sesi',
     color: '#8a8a8a',
     bgGradient: 'radial-gradient(ellipse at 50% 100%, #1a1a1a 0%, #0d0d0d 60%, #050505 100%)',
@@ -123,7 +123,7 @@ export const REGIONS: RegionData[] = [
   {
     id: 'cursed_city',
     name: 'Lanetli Şehir',
-    seThreshold: 25000000,
+    seThreshold: 75000000,
     atmosphere: 'Kırmızı-siyah, yıkık binalar, çığlık ambiyansı',
     color: '#c0392b',
     bgGradient: 'radial-gradient(ellipse at 50% 100%, #2d0a08 0%, #1a0505 60%, #080202 100%)',
@@ -131,7 +131,7 @@ export const REGIONS: RegionData[] = [
   {
     id: 'dark_temple',
     name: 'Karanlık Tapınak',
-    seThreshold: 1000000000,
+    seThreshold: 5000000000,
     atmosphere: 'Saf siyah, rünler parlıyor, ritüel davul sesi',
     color: '#1a1a2e',
     bgGradient: 'radial-gradient(ellipse at 50% 100%, #05051a 0%, #020210 60%, #010108 100%)',

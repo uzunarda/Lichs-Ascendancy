@@ -12,7 +12,10 @@ export default function LichSkull() {
   const [particles, setParticles] = useState<Particle[]>([]);
   const pid = useRef(0);
 
-  const handleClick = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+  const handleClick = useCallback((e: React.PointerEvent) => {
+    // Prevent default to stop synthetic mouse events after touch
+    e.preventDefault();
+    
     soundManager.init(); // Initialize audio context on first click
     click();
     
@@ -20,9 +23,8 @@ export default function LichSkull() {
     soundManager.playClick(isFrenzyActive);
     
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const isTouch = 'touches' in e;
-    const clientX = isTouch ? (e as React.TouchEvent).touches[0].clientX : (e as React.MouseEvent).clientX;
-    const clientY = isTouch ? (e as React.TouchEvent).touches[0].clientY : (e as React.MouseEvent).clientY;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
     
     // Relative to the container
     const x = clientX - rect.left;
@@ -34,6 +36,8 @@ export default function LichSkull() {
   }, [click, frenzy]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.repeat) return;
+    
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       
@@ -71,22 +75,21 @@ export default function LichSkull() {
       )}
 
       <div
-        className={`relative w-40 h-40 md:w-44 md:h-44 flex items-center justify-center
+        className={`relative w-40 h-40 md:w-48 md:h-48 flex items-center justify-center
                     cursor-pointer select-none transition-transform duration-75
-                    hover:scale-105 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-full`}
-        onClick={handleClick}
-        onTouchStart={handleClick}
+                    hover:scale-105 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-gold/50 rounded-full z-10`}
+        onPointerDown={handleClick}
         onKeyDown={handleKeyDown}
         tabIndex={0}
         role="button"
         aria-label="Lich'e tıkla"
       >
-        <div className={`relative z-10 
-                          text-gold drop-shadow-[0_0_20px_rgba(212,175,55,0.6)]
-                          transition-colors duration-300
-                          ${isFrenzy ? 'anim-frenzy-pulse !text-orange-400 drop-shadow-[0_0_30px_#ff6b35]' : ''}`}>
-          <Skull size={112} strokeWidth={1.5} />
-        </div>
+        <Skull
+          size={110}
+          strokeWidth={1.5}
+          className={`transition-colors duration-200 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]
+                      ${isFrenzy ? 'text-blood animate-pulse' : 'text-bone hover:text-white'}`}
+        />
         <div className="skull-glow anim-glow-pulse" />
         {particles.map(p => (
           <div key={p.id} className="soul-particle" style={{ left: p.x, top: p.y }}>

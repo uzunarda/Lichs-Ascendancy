@@ -9,6 +9,9 @@ import UpgradePanel  from './components/UpgradePanel';
 import RegionMap     from './components/RegionMap';
 import PrestigePanel from './components/PrestigePanel';
 import NotificationManager from './components/NotificationManager';
+import WorldsModal   from './components/WorldsModal';
+import SettingsModal from './components/SettingsModal';
+import BottomNavbar  from './components/BottomNavbar';
 import './index.css';
 import './styles/animation.css';
 type TabId = 'main' | 'army' | 'upgrades' | 'prestige';
@@ -31,6 +34,8 @@ export default function App() {
   const [activeTab, setActiveTab]   = useState<TabId>('main');
   const [panelTab, setPanelTab]     = useState<'helpers' | 'prestige'>('helpers');
   const [offlineMsg, setOfflineMsg] = useState<string | null>(null);
+  const [isWorldsModalOpen, setWorldsModalOpen] = useState(false);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const tickRef = useRef(tick);
   tickRef.current = tick;
@@ -90,18 +95,36 @@ export default function App() {
         </div>
       )}
 
-      <ResourceBar />
+      <ResourceBar 
+        onOpenWorlds={() => setWorldsModalOpen(true)}
+        onOpenSettings={() => setSettingsModalOpen(true)}
+      />
 
       {/* DESKTOP (≥ 768px) */}
-      <div className="relative z-10 flex-1 hidden md:grid md:grid-cols-[260px_1fr_300px] lg:grid-cols-[280px_1fr_320px]">
-        <aside className="flex flex-col border-r border-border bg-black/70 backdrop-blur-sm overflow-hidden">
+      <div className="relative z-10 flex-1 hidden md:grid md:grid-cols-[300px_1fr_300px] pb-14">
+        <aside className="flex flex-col border-r border-border bg-black/70 backdrop-blur-sm overflow-hidden gap-4 pt-4 pb-4 px-2">
           <UpgradePanel />
-          <RegionMap />
-        </aside>
-        <main className="flex flex-col items-center justify-center gap-8 p-8 min-h-[70vh]">
-          <LichSkull />
           <RitualPanel />
+        </aside>
+        
+        <main className="flex flex-col items-center justify-center p-8 min-h-[70vh] relative overflow-hidden">
+          {/* Runic Background Ring Effect */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none opacity-20">
+            <svg viewBox="0 0 100 100" className="w-full h-full animate-[spin_60s_linear_infinite]">
+              <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gold" strokeDasharray="2 1" />
+              <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="0.2" className="text-gold" />
+              <path d="M50 2 L50 98 M2 50 L98 50 M16 16 L84 84 M16 84 L84 16" stroke="currentColor" strokeWidth="0.2" className="text-gold opacity-50" />
+            </svg>
+          </div>
+          
+          <LichSkull />
+          
+          <div className="mt-8 font-cinzel text-center opacity-70">
+            <div className="text-sm tracking-[0.3em] text-gold-dim uppercase mb-1">Ruh Çekirdeği</div>
+            <div className="text-xs text-ink-dim">Karanlık giderek büyüyor...</div>
+          </div>
         </main>
+        
         <aside className="flex flex-col border-l border-border bg-black/70 backdrop-blur-sm overflow-hidden">
           <div className="flex border-b border-border bg-black/40">
             {(['helpers', 'prestige'] as const).map(t => (
@@ -126,13 +149,16 @@ export default function App() {
       <div className="relative z-10 flex flex-col flex-1 md:hidden pb-16">
         <div className="flex-1 overflow-y-auto overscroll-contain">
           {activeTab === 'main' && (
-            <div className="flex flex-col items-center gap-5 px-4 py-6">
+            <div className="flex flex-col items-center justify-center gap-5 px-4 py-12 min-h-[60vh]">
               <LichSkull />
-              <RitualPanel />
-              <RegionMap />
             </div>
           )}
-          {activeTab === 'army'     && <HelperPanel />}
+          {activeTab === 'army' && (
+            <div className="flex flex-col h-full gap-4 p-2">
+              <RitualPanel />
+              <HelperPanel />
+            </div>
+          )}
           {activeTab === 'upgrades' && <UpgradePanel />}
           {activeTab === 'prestige' && <PrestigePanel />}
         </div>
@@ -155,22 +181,12 @@ export default function App() {
       </div>
 
       <NotificationManager />
-
-      {/* Footer — sadece desktop */}
-      <footer className="hidden md:flex relative z-10 items-center gap-4 px-6 py-2
-                         bg-black/80 border-t border-border backdrop-blur-md">
-        <button
-          onClick={saveGame}
-          className="font-cinzel text-[0.75rem] tracking-widest uppercase text-ink-dim
-                     border border-border px-3 py-1.5 rounded hover:text-ink
-                     hover:border-border-hover transition-colors"
-        >
-          💾 Kaydet
-        </button>
-        <span className="text-[0.75rem] text-ink-dim italic">
-          Son kayıt: {new Date(lastSaved).toLocaleTimeString('tr')}
-        </span>
-      </footer>
+      <WorldsModal isOpen={isWorldsModalOpen} onClose={() => setWorldsModalOpen(false)} />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+      <BottomNavbar 
+        onOpenWorlds={() => setWorldsModalOpen(true)}
+        onOpenSettings={() => setSettingsModalOpen(true)}
+      />
     </div>
   );
 }

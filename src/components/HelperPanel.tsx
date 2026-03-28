@@ -1,4 +1,4 @@
-import { useGameStore } from '../store/gameStore';
+import { useGameStore, calcHelperContribution } from '../store/gameStore';
 import { HELPERS } from '../data/gameData';
 import { formatSE, calcHelperCost } from '../systems/numberUtils';
 import { soundManager } from '../systems/soundManager';
@@ -57,7 +57,14 @@ export default function HelperPanel() {
 
                 <div className="min-w-0">
                   <div className="font-cinzel text-[0.82rem] text-gold leading-tight truncate">{h.name}</div>
-                  <div className="text-[0.65rem] text-ink-dim truncate">{h.description}</div>
+                  <div className="flex flex-col gap-0.5 mt-0.5">
+                    <span className="text-[0.65rem] text-ink-dim truncate">{h.description}</span>
+                    {count > 0 && (
+                      <span className="text-[0.60rem] font-bold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded-sm w-max">
+                        +{formatSE(calcHelperContribution(h.id))} SE/sn
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex flex-col items-end justify-center min-w-[3.5rem] text-right">

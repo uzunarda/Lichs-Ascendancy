@@ -11,13 +11,13 @@ export default {
         mid:     { DEFAULT: '#12081a' },
         surface: { DEFAULT: 'rgba(18,8,26,0.85)', hover: 'rgba(30,12,44,0.95)' },
         border:  { DEFAULT: 'rgba(212,175,55,0.2)', hover: 'rgba(212,175,55,0.5)' },
-        ink:     { DEFAULT: '#c8b8dc', dim: '#6a5580' },
+        ink:     { DEFAULT: '#fef9ec', dim: '#d4af37' },
         green:   { DEFAULT: '#3a7a4a' },
         void:    { DEFAULT: '#a78bfa' },
       },
       fontFamily: {
-        cinzel:  ['Cinzel', 'serif'],
-        crimson: ['"Crimson Pro"', 'Georgia', 'serif'],
+        cinzel:  ['"Cormorant SC"', 'serif'],
+        crimson: ['"Alegreya Sans"', 'sans-serif'],
       },
       boxShadow: {
         gold:   '0 0 12px rgba(212,175,55,0.5)',

@@ -66,6 +66,7 @@ interface GameState {
   processOffline: () => void;
   addNotification: (message: string, type?: 'info' | 'success' | 'warning') => void;
   removeNotification: (id: number) => void;
+  resetGame: () => void;
 }
 
 const SAVE_KEY = 'lichs_ascendancy_save';
@@ -476,9 +477,47 @@ export const useGameStore = create<GameState>((set, get) => ({
       notifications: s.notifications.filter(n => n.id !== id)
     }));
   },
+
+  resetGame: () => {
+    localStorage.removeItem(SAVE_KEY);
+    set(getInitialState());
+  },
 }));
 
 export function calcCurrentSEperSec(): number {
   const state = useGameStore.getState();
   return calcSEperSec(state.helpers, state.upgrades, state.prestigePowers);
+}
+
+export function calcHelperContribution(helperId: string): number {
+  const state = useGameStore.getState();
+  const count = state.helpers[helperId] ?? 0;
+  if (count === 0) return 0;
+  
+  const helper = HELPERS.find(h => h.id === helperId);
+  if (!helper) return 0;
+
+  let rate = helper.baseSEperSec * count * calcMilestoneBonus(count);
+  
+  const helperUpgrade = state.upgrades.find(u => u.effect === `${helper.id}*2` && u.purchased);
+  if (helperUpgrade) rate *= 2;
+
+  if (helper.id === 'zombie_harvester') {
+    const boneArmy = state.upgrades.find(u => u.id === 'synergy_bone_army' && u.purchased);
+    if (boneArmy) rate *= 3;
+  }
+  if (helper.id === 'vampire_agent') {
+    const noSleep = state.upgrades.find(u => u.id === 'synergy_night_lord' && u.purchased) ||
+                    state.prestigePowers.find(p => p.id === 'vampiric_embrace' && p.purchased);
+    if (!noSleep) rate *= 0.999;
+  }
+
+  const undying = state.prestigePowers.find(p => p.id === 'undying_body' && p.purchased);
+  if (undying) rate *= 1.25;
+
+  const darkDemigod = state.helpers['dark_demigod'] ?? 0;
+  const lichApp = state.helpers['lich_apprentice'] ?? 0;
+  if (darkDemigod >= 2 && lichApp >= 10) rate *= 1.5;
+
+  return rate;
 }
