@@ -4,14 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        gold:    { DEFAULT: '#d4af37', dim: '#8a6d1a' },
+        gold:    { DEFAULT: '#d4af37', dim: '#bfa04a' },
         purple:  { DEFAULT: '#4a1e6b', light: '#7c3aad', dim: '#2a0f3d' },
         blood:   { DEFAULT: '#8b1a1a', light: '#c0392b' },
-        dark:    { DEFAULT: '#080408' },
-        mid:     { DEFAULT: '#12081a' },
-        surface: { DEFAULT: 'rgba(18,8,26,0.85)', hover: 'rgba(30,12,44,0.95)' },
-        border:  { DEFAULT: 'rgba(212,175,55,0.2)', hover: 'rgba(212,175,55,0.5)' },
-        ink:     { DEFAULT: '#fef9ec', dim: '#a09faf' },
+        dark:    { DEFAULT: '#08050a' },
+        mid:     { DEFAULT: '#150a1f' },
+        surface: { DEFAULT: 'rgba(12,6,18,0.92)', hover: 'rgba(25,10,40,0.98)' },
+        border:  { DEFAULT: 'rgba(212,175,55,0.25)', hover: 'rgba(212,175,55,0.55)' },
+        ink:     { DEFAULT: '#fef9ec', dim: '#cbd5e1' },
         green:   { DEFAULT: '#3a7a4a' },
         void:    { DEFAULT: '#a78bfa' },
       },

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { BUILDINGS, BUILDING_SYNERGIES, BUILDING_BASE_SLOTS, BUILDING_PRESTIGE_EXTRA_SLOTS } from '../data/buildingData';
+import { useArtifactStore } from './artifactStore';
 import type { BuildingInstance } from '../types';
 
 // ─── State Interface ─────────────────────────────────────────────────────────
@@ -86,11 +87,12 @@ export const useBuildingStore = create<BuildingState>((set, get) => ({
     }
 
     const now = Date.now();
+    const artifactBuildMult = useArtifactStore.getState().getBuildTimeMult();
     const instance: BuildingInstance = {
       id: buildingId,
       instanceId: newInstanceId(),
       startedAt: now,
-      completesAt: now + data.buildTimeSec * 1000,
+      completesAt: now + data.buildTimeSec * 1000 * artifactBuildMult,
       completed: false,
     };
 

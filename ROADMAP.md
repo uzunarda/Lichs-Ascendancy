@@ -50,47 +50,47 @@
 
 ---
 
-### FAZ 10 — Boss Savaşları ⏱ 2–3 hafta
+### FAZ 10 — Boss Savaşları ⏱ 2–3 hafta ✅ TAMAMLANDI
 
-- [ ] `bossFight` state'i gameStore'a eklenmesi
-- [ ] 5 boss: Yokluğun Sesi → İlk Yokluk (Final)
-- [ ] Tick-based savaş mekaniği (SE ≈ HP)
-- [ ] Boss özel yetenekleri
-- [ ] `BossBanner.tsx` — boss HP çubuğu
-- [ ] Void Tozu + Rüya Parçası ödül drop sistemi
-
----
-
-### FAZ 11 — Yeni Prestige Katmanları ⏱ 2–3 hafta
-
-- [ ] 2. Kat: Karanlık Çözülüş — Karanlık Kristal para birimi
-- [ ] 3. Kat: Çözülme — Çözülme Kıvılcımı para birimi
-- [ ] Karanlık Kristal Mağazası (7 güç)
-- [ ] Çözülme Kıvılcımı Mağazası (6 güç)
-- [ ] Katmanlı sıfırlama mekaniğii
+- [x] `bossFight` state'i gameStore'a eklenmesi
+- [x] 5 boss: Yokluğun Sesi → İlk Yokluk (Final)
+- [x] Tick-based savaş mekaniği (SE ≈ HP)
+- [x] Boss özel yetenekleri
+- [x] `BossBanner.tsx` — boss HP çubuğu
+- [x] Void Tozu + Rüya Parçası ödül drop sistemi
 
 ---
 
-### FAZ 12 — Koridor & Artifakt ⏱ 2–3 hafta
+### FAZ 11 — Yeni Prestige Katmanları ⏱ 2–3 hafta ✅ TAMAMLANDI
 
-- [ ] `eventStore.ts` — rastgele olay sistemi
-- [ ] 7 olay tipi (Gezgin Ruh, Lanetli Eşya, vb.)
-- [ ] 30 sn karar süresi, bölgeye özgü olaylar
-- [ ] `EventBanner.tsx` — olay bildirimi UI
-- [ ] `artifactStore.ts` — artifakt koleksiyon sistemi
-- [ ] 5 artifakt tier'ı (Sıradan → Benzersiz)
-- [ ] Set bonusları (5 set)
-- [ ] `ArtifactCard.tsx` — koleksiyon UI
+- [x] 2. Kat: Karanlık Çözülüş — Karanlık Kristal para birimi
+- [x] 3. Kat: Çözülme — Çözülme Kıvılcımı para birimi
+- [x] Karanlık Kristal Mağazası (7 güç)
+- [x] Çözülme Kıvılcımı Mağazası (6 güç)
+- [x] Katmanlı sıfırlama mekaniği
 
 ---
 
-### FAZ 13 — Liderlik & QA ⏱ 2–3 hafta
+### FAZ 12 — Koridor & Artifakt ⏱ 2–3 hafta ✅ TAMAMLANDI
 
-- [ ] Opsiyonel skor API backend'i
-- [ ] `leaderboardStore.ts`
-- [ ] `LeaderboardModal.tsx`
-- [ ] v2→v3 save migrasyon mekanizması
-- [ ] Kapsamlı bug fix & balans
+- [x] `eventStore.ts` — rastgele olay sistemi
+- [x] 7 olay tipi (Gezgin Ruh, Lanetli Eşya, vb.)
+- [x] 30 sn karar süresi, bölgeye özgü olaylar
+- [x] `EventBanner.tsx` — olay bildirimi UI
+- [x] `artifactStore.ts` — artifakt koleksiyon sistemi
+- [x] 5 artifakt tier'ı (Sıradan → Benzersiz)
+- [x] Set bonusları (5 set)
+- [x] `ArtifactCard.tsx` — koleksiyon UI
+
+---
+
+### FAZ 13 — Liderlik & QA ⏱ 2 hafta ✅ TAMAMLANDI
+
+- [x] Opsiyonel skor API backend'i (Gelecekte entegre edilebilir)
+- [x] `leaderboardStore.ts`
+- [x] `LeaderboardModal.tsx`
+- [x] v2→v3 save migrasyon mekanizması
+- [x] Kapsamlı bug fix & balans
 
 ---
 
@@ -187,8 +187,8 @@
 | Versiyon | Faz | Durum |
 |----------|-----|-------|
 | V1 | Faz 1–6 (Core, Ritual, Prestige, Polish) | ✅ Tamamlandı |
-| V2 | Faz 7 (Yeni 5 Bölge + Yeni Helper Tierları) | ✅ Tamamlandı |
-| V2 | Faz 8–13 | 🔴 Başlanmadı |
+| V2 | Faz 7–10 | ✅ Tamamlandı |
+| **V2 (Faz 11-13)** | ✅ Tamamlandı | Çok katmanlı prestij (DC/SD), Artifaktlar ve Olaylar aktif. |
 | V3 | Faz 14–22 | 🔴 Başlanmadı |
 
 > **Sonraki Öncelikli Adımlar:**

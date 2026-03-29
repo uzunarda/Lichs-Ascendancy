@@ -1,13 +1,25 @@
-import { Save, Globe, Settings, Map } from 'lucide-react';
+import { Save, Settings, Map, Scroll, Swords, Sparkles, Trophy } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { useState, useEffect } from 'react';
+import RuneCorner from './shared/RuneCorner';
 
 interface Props {
   onOpenWorlds: () => void;
+  onOpenSkillTree: () => void;
   onOpenSettings: () => void;
+  onOpenBosses: () => void;
+  onOpenArtifacts: () => void;
+  onOpenLeaderboard: () => void;
 }
 
-export default function BottomNavbar({ onOpenWorlds, onOpenSettings }: Props) {
+export default function BottomNavbar({ 
+  onOpenWorlds, 
+  onOpenSkillTree, 
+  onOpenSettings, 
+  onOpenBosses, 
+  onOpenArtifacts,
+  onOpenLeaderboard
+}: Props) {
   const saveGame  = useGameStore(s => s.saveGame);
   const lastSaved = useGameStore(s => s.lastSaveTime);
   const [saveAnim, setSaveAnim] = useState(false);
@@ -31,57 +43,96 @@ export default function BottomNavbar({ onOpenWorlds, onOpenSettings }: Props) {
     return `${Math.floor(sec / 3600)}sa önce`;
   };
 
-  return (
-    <nav className="hidden md:flex fixed bottom-0 left-0 right-0 z-40 h-12
-                    bg-black/90 border-t border-border backdrop-blur-md items-center justify-between px-6">
+  const btnClass = "relative font-cinzel text-[10px] uppercase tracking-widest font-black px-4 py-2 border rounded-sm transition-all duration-200 hover:brightness-125 active:scale-95 flex items-center gap-2 overflow-hidden group";
 
-      {/* Left — Worlds button */}
-      <div className="flex items-center gap-3">
+  return (
+    <nav className="hidden md:flex fixed bottom-0 left-0 right-0 z-40 h-14 items-center justify-between px-6"
+         style={{ background: '#0d0809', borderTop: '1px solid #1e1210' }}>
+
+      {/* Köşe süslemeleri */}
+      <RuneCorner position="top-left" opacity={0.2} size={20} />
+      <RuneCorner position="top-right" opacity={0.2} size={20} />
+      <RuneCorner position="bottom-left" opacity={0.2} size={20} />
+      <RuneCorner position="bottom-right" opacity={0.2} size={20} />
+
+      {/* Süsleme çizgileri */}
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #c9a85c22, #c9a85c44, #c9a85c22, transparent)' }} />
+
+      {/* Sol — Aksiyonlar */}
+      <div className="flex items-center gap-2 relative z-10">
         <button
           onClick={onOpenWorlds}
-          className="flex items-center gap-2 font-cinzel text-xs tracking-widest uppercase text-ink-dim
-                     border border-border bg-surface px-3 py-1.5 rounded
-                     hover:text-gold hover:border-gold/50 hover:shadow-[0_0_10px_rgba(212,175,55,0.15)]
-                     transition-all duration-200 active:scale-95"
+          className={btnClass}
+          style={{ color: '#c9a85c', borderColor: '#3a2215', background: '#0a0608' }}
         >
           <Map size={14} /> Bölgeler
         </button>
+
+        <button
+          onClick={onOpenSkillTree}
+          className={btnClass}
+          style={{ color: '#9333ea', borderColor: '#2d1458', background: '#0a0608' }}
+        >
+          <span className="text-lg leading-none mt-[-2px]">🕸</span> Ağaç
+        </button>
+
+        <button
+          onClick={onOpenBosses}
+          className={btnClass}
+          style={{ color: '#ef4444', borderColor: '#450a0a', background: '#0a0608' }}
+        >
+          <Swords size={14} /> Bosslar
+        </button>
+
+        <button
+          onClick={onOpenArtifacts}
+          className={btnClass}
+          style={{ color: '#60a5fa', borderColor: '#1e3a8a', background: '#0a0608' }}
+        >
+          <Scroll size={14} /> Artifaktlar
+        </button>
+
+        <button
+          onClick={onOpenLeaderboard}
+          className={btnClass}
+          style={{ color: '#fbbf24', borderColor: '#78350f', background: '#0a0608' }}
+        >
+          <Trophy size={14} /> Liderlik
+        </button>
       </div>
 
-      {/* Center — game title / brand */}
-      <div className="font-cinzel text-xs tracking-[0.4em] uppercase text-ink-dim/30 select-none">
-        Lich's Ascendancy
+      <div className="font-cinzel text-[11px] tracking-[0.6em] uppercase text-stone-700 select-none font-black flex items-center gap-4">
+        <span className="opacity-20">✦</span>
+        LICH'S ASCENDANCY
+        <span className="opacity-20">✦</span>
       </div>
 
-      {/* Right — Save + Settings */}
-      <div className="flex items-center gap-3">
-        <span className="text-[0.6rem] text-ink-dim/40 italic hidden lg:inline">
-          {saveAnim ? '✓ Kaydedildi' : `Son kayıt: ${timeSince()}`}
-        </span>
+      {/* Sağ — Sistem */}
+      <div className="flex items-center gap-2 relative z-10">
+        <div className="flex flex-col items-end mr-3">
+           <span className="text-[8px] font-cinzel tracking-widest text-stone-600 uppercase">Son Mukavemet</span>
+           <span className="text-[10px] text-stone-400 font-bold italic">
+             {saveAnim ? '✓ Mühürlendi' : timeSince()}
+           </span>
+        </div>
 
         <button
           onClick={handleSave}
-          className={[
-            'flex items-center gap-2 font-cinzel text-xs tracking-widest uppercase',
-            'border px-3 py-1.5 rounded transition-all duration-200 active:scale-95',
-            saveAnim
-              ? 'text-emerald-400 border-emerald-500/50 bg-emerald-400/10 shadow-[0_0_8px_rgba(52,211,153,0.2)]'
-              : 'text-ink-dim border-border hover:text-ink hover:border-border-hover hover:bg-surface',
-          ].join(' ')}
+          className={btnClass}
+          style={saveAnim 
+            ? { color: '#4ade80', borderColor: '#166534', background: '#052e16' }
+            : { color: '#c9a85c', borderColor: '#3a2215', background: '#0a0608' }
+          }
         >
-          <Save size={14} className={saveAnim ? 'animate-bounce' : ''} />
-          {saveAnim ? 'Kaydedildi' : 'Kaydet'}
+          <Save size={14} /> {saveAnim ? 'Mühürlendi' : 'Mühürle'}
         </button>
 
         <button
           onClick={onOpenSettings}
-          className="flex items-center gap-2 font-cinzel text-xs tracking-widest uppercase text-ink-dim
-                     border border-border px-3 py-1.5 rounded
-                     hover:text-white hover:border-border-hover hover:bg-surface
-                     transition-all duration-200 active:scale-95"
-          aria-label="Ayarlar"
+          className={btnClass}
+          style={{ color: '#7a5a30', borderColor: '#2a1a10', background: '#0a0608' }}
         >
-          <Settings size={14} /> Ayarlar
+          <Settings size={14} />
         </button>
       </div>
     </nav>

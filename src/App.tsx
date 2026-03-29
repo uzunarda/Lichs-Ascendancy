@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from './store/gameStore';
 import { useBuildingStore } from './store/buildingStore';
+import { useEventStore } from './store/eventStore';
 import { REGIONS } from './data/gameData';
 import ResourceBar    from './components/ResourceBar';
 import LichSkull     from './components/LichSkull';
@@ -13,20 +14,26 @@ import BuildingPanel from './components/BuildingPanel';
 import SkillTreeView from './components/SkillTreeView';
 import NotificationManager from './components/NotificationManager';
 import WorldsModal   from './components/WorldsModal';
+import ArtifactModal from './components/ArtifactModal';
+import LeaderboardModal from './components/LeaderboardModal';
 import SettingsModal from './components/SettingsModal';
+import BossBanner     from './components/BossBanner';
+import BossPanel      from './components/BossPanel';
+import EventBanner     from './components/EventBanner';
 import BottomNavbar  from './components/BottomNavbar';
+import RuneCorner    from './components/shared/RuneCorner';
 import './index.css';
 import './styles/animation.css';
-type TabId  = 'main' | 'army' | 'upgrades' | 'buildings' | 'skilltree' | 'prestige';
-type LeftTab = 'upgrades' | 'skilltree' | 'ritual';
+type TabId  = 'main' | 'army' | 'upgrades' | 'buildings' | 'prestige' | 'bosses';
+type LeftTab = 'upgrades' | 'ritual';
 
 const TABS: { id: TabId; icon: string; label: string }[] = [
   { id: 'main',      icon: '☠',  label: 'Taht' },
   { id: 'army',      icon: '⚔',  label: 'Ordu' },
+  { id: 'bosses',    icon: '👿', label: 'Boss' },
   { id: 'upgrades',  icon: '✦',  label: 'Güç' },
   { id: 'buildings', icon: '🏙', label: 'Hane' },
-  { id: 'skilltree', icon: '🕸', label: 'Ağaç' },
-  { id: 'prestige',  icon: '💀', label: 'Döngü' },
+  { id: 'prestige',  icon: '💎', label: 'Döngü' },
 ];
 
 export default function App() {
@@ -42,14 +49,18 @@ export default function App() {
   const [leftTab, setLeftTab]       = useState<LeftTab>('upgrades');
   const [offlineMsg, setOfflineMsg] = useState<string | null>(null);
   const [isWorldsModalOpen, setWorldsModalOpen] = useState(false);
+  const [isSkillTreeModalOpen, setSkillTreeModalOpen] = useState(false);
   const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [isBossPanelOpen, setBossPanelOpen] = useState(false);
+  const [isArtifactsModalOpen, setArtifactsModalOpen] = useState(false);
+  const [isLeaderboardModalOpen, setLeaderboardModalOpen] = useState(false);
   const tickBuildings = useBuildingStore(s => s.tickBuildings);
 
-  // ─── Desktop left panel (Upgrades / Skill Tree / Rituals) ───────────────
+  // ─── Desktop left panel (Upgrades / Rituals) ───────────────
   const DesktopLeftPanel = () => (
     <>
       <div className="flex border-b border-border bg-black/40">
-        {(['upgrades', 'skilltree', 'ritual'] as LeftTab[]).map(t => (
+        {(['upgrades', 'ritual'] as LeftTab[]).map(t => (
           <button
             key={t}
             onClick={() => setLeftTab(t)}
@@ -58,12 +69,11 @@ export default function App() {
                 ? 'text-gold border-b-2 border-gold bg-gold/5'
                 : 'text-ink-dim hover:text-ink hover:bg-white/[0.03]'}`}
           >
-            {t === 'upgrades' ? 'Güç' : t === 'skilltree' ? 'Ağaç' : 'Ritüel'}
+            {t === 'upgrades' ? 'Güç' : 'Ritüel'}
           </button>
         ))}
       </div>
       {leftTab === 'upgrades'  && <UpgradePanel />}
-      {leftTab === 'skilltree' && <SkillTreeView />}
       {leftTab === 'ritual'    && <RitualPanel />}
     </>
   );
@@ -91,8 +101,14 @@ export default function App() {
     let last = Date.now();
     const id = setInterval(() => {
       const now = Date.now();
-      tickRef.current((now - last) / 1000);
+      const delta = (now - last) / 1000;
+      tickRef.current(delta);
       tickBuildings(now);
+      
+      // Event system tick
+      const state = useGameStore.getState();
+      useEventStore.getState().tick(delta, state.currentRegionIndex);
+
       last = now;
     }, 100);
     return () => clearInterval(id);
@@ -129,51 +145,88 @@ export default function App() {
 
       <ResourceBar 
         onOpenWorlds={() => setWorldsModalOpen(true)}
+        onOpenSkillTree={() => setSkillTreeModalOpen(true)}
         onOpenSettings={() => setSettingsModalOpen(true)}
+        onOpenLeaderboard={() => setLeaderboardModalOpen(true)}
       />
 
       {/* DESKTOP (≥ 768px) */}
-      <div className="relative z-10 flex-1 hidden md:grid md:grid-cols-[320px_1fr_320px] overflow-hidden pb-12">
-        <aside className="flex flex-col border-r border-border bg-black/75 backdrop-blur-sm overflow-hidden">
-          <DesktopLeftPanel />
+      <div className="relative z-10 flex-1 hidden md:grid md:grid-cols-[320px_1fr_320px] overflow-hidden pb-14">
+        <aside 
+          className="relative flex flex-col border-r overflow-hidden"
+          style={{ background: '#0d0809', borderColor: '#1e1210' }}
+        >
+          <RuneCorner position="top-left" opacity={0.2} />
+          <RuneCorner position="top-right" opacity={0.2} />
+          <RuneCorner position="bottom-left" opacity={0.2} />
+          <RuneCorner position="bottom-right" opacity={0.2} />
+
+          <div className="flex border-b" style={{ background: '#0a0608', borderColor: '#1e1210' }}>
+            {(['upgrades', 'ritual'] as LeftTab[]).map(t => (
+              <button
+                key={t}
+                onClick={() => setLeftTab(t)}
+                className={`flex-1 py-3 font-cinzel text-[0.7rem] tracking-[0.2em] uppercase transition-all duration-300
+                  ${leftTab === t
+                    ? 'text-[#f0c060] bg-[#c9a85c0a] shadow-[inset_0_-2px_0_#c9a85c]'
+                    : 'text-stone-600 hover:text-stone-400 hover:bg-white/[0.02]'}`}
+              >
+                {t === 'upgrades' ? 'Güç' : 'Ritüel'}
+              </button>
+            ))}
+          </div>
+          <div className="flex-1 overflow-hidden flex flex-col relative z-10">
+            {leftTab === 'upgrades'  && <UpgradePanel />}
+            {leftTab === 'ritual'    && <RitualPanel />}
+          </div>
         </aside>
         
         <main className="flex flex-col items-center justify-center p-8 min-h-[70vh] relative overflow-hidden">
           {/* Runic Background Ring Effect */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none opacity-20">
-            <svg viewBox="0 0 100 100" className="w-full h-full animate-[spin_60s_linear_infinite]">
-              <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gold" strokeDasharray="2 1" />
-              <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="0.2" className="text-gold" />
-              <path d="M50 2 L50 98 M2 50 L98 50 M16 16 L84 84 M16 84 L84 16" stroke="currentColor" strokeWidth="0.2" className="text-gold opacity-50" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none opacity-10">
+            <svg viewBox="0 0 100 100" className="w-full h-full animate-[spin_120s_linear_infinite]">
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#c9a85c" strokeWidth="0.2" strokeDasharray="2 1" />
+              <circle cx="50" cy="50" r="40" fill="none" stroke="#c9a85c" strokeWidth="0.1" />
+              <path d="M50 2 L50 98 M2 50 L98 50 M16 16 L84 84 M16 84 L84 16" stroke="#c9a85c" strokeWidth="0.1" />
             </svg>
           </div>
           
           <LichSkull />
           
           <div className="mt-8 font-cinzel text-center opacity-70">
-            <div className="text-sm tracking-[0.3em] text-gold-dim uppercase mb-1">Ruh Çekirdeği</div>
-            <div className="text-xs text-ink-dim">Karanlık giderek büyüyor...</div>
+            <div className="text-sm tracking-[0.3em] font-black uppercase mb-1" style={{ color: '#c9a85c' }}>Ruh Çekirdeği</div>
+            <div className="text-[10px] text-stone-500 tracking-widest font-bold">Karanlık giderek büyüyor...</div>
           </div>
         </main>
         
-        <aside className="flex flex-col border-l border-border bg-black/75 backdrop-blur-sm overflow-hidden">
-          <div className="flex border-b border-border bg-black/40">
+        <aside 
+          className="relative flex flex-col border-l overflow-hidden"
+          style={{ background: '#0d0809', borderColor: '#1e1210' }}
+        >
+          <RuneCorner position="top-left" opacity={0.2} />
+          <RuneCorner position="top-right" opacity={0.2} />
+          <RuneCorner position="bottom-left" opacity={0.2} />
+          <RuneCorner position="bottom-right" opacity={0.2} />
+
+          <div className="flex border-b" style={{ background: '#0a0608', borderColor: '#1e1210' }}>
             {(['helpers', 'buildings', 'prestige'] as const).map(t => (
               <button
                 key={t}
                 onClick={() => setPanelTab(t)}
-                className={`flex-1 py-2 font-cinzel text-xs tracking-widest uppercase transition-colors
+                className={`flex-1 py-3 font-cinzel text-[0.7rem] tracking-[0.2em] uppercase transition-all duration-300
                   ${panelTab === t
-                    ? 'text-gold border-b-2 border-gold bg-gold/5'
-                    : 'text-ink-dim hover:text-ink hover:bg-white/[0.03]'}`}
+                    ? 'text-[#f0c060] bg-[#c9a85c0a] shadow-[inset_0_-2px_0_#c9a85c]'
+                    : 'text-stone-600 hover:text-stone-400 hover:bg-white/[0.02]'}`}
               >
                 {t === 'helpers' ? 'Ordu' : t === 'buildings' ? 'Hane' : 'Prestige'}
               </button>
             ))}
           </div>
-          {panelTab === 'helpers'   && <HelperPanel />}
-          {panelTab === 'buildings' && <BuildingPanel />}
-          {panelTab === 'prestige'  && <PrestigePanel />}
+          <div className="flex-1 overflow-hidden flex flex-col relative z-10">
+            {panelTab === 'helpers'   && <HelperPanel />}
+            {panelTab === 'buildings' && <BuildingPanel />}
+            {panelTab === 'prestige'  && <PrestigePanel />}
+          </div>
         </aside>
       </div>
 
@@ -193,8 +246,20 @@ export default function App() {
           )}
           {activeTab === 'upgrades'  && <UpgradePanel />}
           {activeTab === 'buildings' && <BuildingPanel />}
-          {activeTab === 'skilltree' && <SkillTreeView />}
           {activeTab === 'prestige'  && <PrestigePanel />}
+          {activeTab === 'bosses'    && (
+            <div className="p-4 h-full">
+              <button 
+                onClick={() => setBossPanelOpen(true)}
+                className="w-full py-8 bg-void/10 border border-void/40 text-void font-cinzel font-black text-xl uppercase tracking-[0.2em] rounded-xl hover:bg-void/20 hover:border-void transition-all shadow-lg active:scale-[0.98] mb-4"
+              >
+                💀 SAVAŞ PANELİ
+              </button>
+              <div className="bg-surface/30 border border-border rounded-xl p-6 text-center text-ink-dim font-cinzel italic text-sm">
+                Buradan boss panelini açarak kadim varlıklara meydan okuyabilirsin.
+              </div>
+            </div>
+          )}
         </div>
 
         <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-16
@@ -215,11 +280,21 @@ export default function App() {
       </div>
 
       <NotificationManager />
+      <BossBanner />
+      <EventBanner />
       <WorldsModal isOpen={isWorldsModalOpen} onClose={() => setWorldsModalOpen(false)} />
+      <ArtifactModal isOpen={isArtifactsModalOpen} onClose={() => setArtifactsModalOpen(false)} />
+      <LeaderboardModal isOpen={isLeaderboardModalOpen} onClose={() => setLeaderboardModalOpen(false)} />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+      <SkillTreeView isOpen={isSkillTreeModalOpen} onClose={() => setSkillTreeModalOpen(false)} />
+      <BossPanel isOpen={isBossPanelOpen} onClose={() => setBossPanelOpen(false)} />
       <BottomNavbar 
         onOpenWorlds={() => setWorldsModalOpen(true)}
+        onOpenSkillTree={() => setSkillTreeModalOpen(true)}
         onOpenSettings={() => setSettingsModalOpen(true)}
+        onOpenBosses={() => setBossPanelOpen(true)}
+        onOpenArtifacts={() => setArtifactsModalOpen(true)}
+        onOpenLeaderboard={() => setLeaderboardModalOpen(true)}
       />
     </div>
   );

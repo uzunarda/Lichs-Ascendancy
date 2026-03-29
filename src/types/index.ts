@@ -6,6 +6,8 @@ export interface HelperData {
   baseCost: number;
   description: string;
   special: string;
+  baseClickPower?: number; // Flat bonus per unit
+  cpsMultiplier?: number;  // Percentage of total CPS per unit
 }
 
 export interface HelperState {
@@ -41,6 +43,11 @@ export interface RegionData {
   atmosphere: string;
   color: string;
   bgGradient: string;
+  bonus?: {
+    type: 'production' | 'click' | 'cost' | 'all';
+    value: number; // Multiplier (e.g., 1.2 = x1.2)
+    description: string;
+  };
 }
 
 export interface PrestigePower {
@@ -93,4 +100,84 @@ export interface SkillNode {
   voidPath?: boolean;
   col: number;
   row: number;
+}
+
+// ─── Phase 10: Boss Fight System ─────────────────────────────────────────────
+
+export interface BossData {
+  id: string;
+  name: string;
+  description: string;
+  maxHp: number;
+  timeLimit: number; // in seconds
+  rewards: {
+    vt: number; // Void Dust
+    dp: number; // Dream Fragments
+  };
+  unlockCondition?: {
+    minSe?: number;
+    minRegion?: number;
+  };
+}
+
+export interface BossFightState {
+  activeBossId: string | null;
+  currentHp: number;
+  timeLeft: number;
+  isVictory: boolean;
+  isDefeat: boolean;
+}
+
+// ─── Phase 12: Event System ───────────────────────────────────────────────────
+
+export interface GameEventChoice {
+  id: string;
+  label: string;
+  description: string;
+  result: {
+    se?: number;
+    cs?: number; // curse stones
+    vt?: number;
+    dp?: number;
+    message: string;
+    type?: 'success' | 'warning' | 'info';
+  };
+  requirement?: {
+    se?: number;
+    cs?: number;
+    vt?: number;
+    dp?: number;
+  };
+}
+
+export interface GameEvent {
+  id: string;
+  name: string;
+  description: string;
+  choices: GameEventChoice[];
+  duration: number; // seconds to decide
+  weight: number;   // probability weight
+  minRegion?: number;
+}
+
+// ─── Phase 12: Artifact System ────────────────────────────────────────────────
+
+export type ArtifactTier = 'common' | 'rare' | 'epic' | 'legendary' | 'unique';
+
+export interface Artifact {
+  id: string;
+  name: string;
+  tier: ArtifactTier;
+  description: string;
+  effectDescription: string;
+  setId?: string;
+  baseEffect: (state: any) => number; // multiplier or flat bonus
+}
+
+export interface ArtifactSet {
+  id: string;
+  name: string;
+  count: number;
+  bonusDescription: string;
+  bonus: (state: any) => number;
 }

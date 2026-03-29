@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { useSkillTreeStore } from '../store/skillTreeStore';
+import { useGameStore } from '../store/gameStore';
 import { SKILL_NODES, BRANCH_META } from '../data/skillTreeData';
 import type { SkillBranch } from '../types';
+import { X, Sparkles, AlertTriangle, Hexagon } from 'lucide-react';
+import RuneCorner from './shared/RuneCorner';
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
-const NODE_W   = 130;
-const NODE_H   = 52;
-const COL_GAP  = 160;
-const ROW_GAP  = 68;
-const PADDING  = 24;
+const NODE_W   = 160;
+const NODE_H   = 65;
+const COL_GAP  = 190;
+const ROW_GAP  = 90;
+const PADDING  = 40;
 
 function nodeX(col: number) { return PADDING + col * COL_GAP; }
 function nodeY(row: number) { return PADDING + row * ROW_GAP; }
@@ -20,31 +23,44 @@ function VoidWarning({ node, onConfirm, onCancel }: {
   onCancel: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-sm mx-4 bg-dark border-2 border-void/60 rounded-xl p-6 shadow-[0_0_40px_rgba(167,139,250,0.3)]">
-        <div className="text-center mb-4">
-          <span className="text-4xl">🕳️</span>
-          <h2 className="font-cinzel text-lg font-black text-void mt-2">YOKLUK YOLU</h2>
-          <p className="text-xs text-ink-dim mt-1 font-cinzel uppercase tracking-widest">Geri Dönüş Yok</p>
+    <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in duration-500">
+      <div 
+        className="w-full max-w-sm mx-4 relative overflow-hidden p-8 border"
+        style={{ background: '#0a0608', borderColor: '#1e1210' }}
+      >
+        <RuneCorner position="top-left" opacity={0.5} />
+        <RuneCorner position="top-right" opacity={0.5} />
+        <RuneCorner position="bottom-left" opacity={0.5} />
+        <RuneCorner position="bottom-right" opacity={0.5} />
+
+        <div className="text-center mb-6">
+          <div className="flex justify-center mb-4">
+             <AlertTriangle size={48} className="text-red-600 animate-pulse" />
+          </div>
+          <h2 className="font-cinzel text-xl font-black text-red-500 mt-2 tracking-[0.2em] uppercase">KARANLIK ANLAŞMA</h2>
+          <p className="text-[10px] text-stone-500 mt-1 font-cinzel uppercase tracking-[0.3em] font-bold">Geri Dönüşü Olmayan Yol</p>
         </div>
-        <p className="text-sm text-ink-dim text-center leading-relaxed mb-2">
-          <span className="text-void font-bold">"{node.name}"</span> seçimi geri alınamaz.
+
+        <p className="text-sm text-stone-400 text-center leading-relaxed mb-4 italic">
+          <span className="text-red-400 font-black">"{node.name}"</span> düğümü ruhuna kazınacak.
         </p>
-        <p className="text-sm text-ink text-center leading-relaxed mb-6">
+        
+        <p className="text-xs text-stone-500 text-center leading-relaxed mb-8 border-y border-white/5 py-4">
           {node.description}
         </p>
-        <div className="flex gap-3">
+
+        <div className="flex gap-4">
           <button
             onClick={onCancel}
-            className="flex-1 py-2 font-cinzel text-sm uppercase tracking-wider text-ink-dim border border-border rounded hover:bg-surface transition-colors"
+            className="flex-1 py-3 font-cinzel text-xs font-black uppercase tracking-widest text-stone-600 border border-stone-900 rounded-sm hover:text-stone-400 transition-colors"
           >
-            Geri Dön
+            Vazgeç
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-2 font-cinzel text-sm uppercase tracking-wider text-void font-bold border border-void/50 rounded bg-void/10 hover:bg-void/20 transition-colors"
+            className="flex-1 py-3 font-cinzel text-xs font-black uppercase tracking-widest text-red-500 border border-red-900/40 rounded-sm bg-red-900/5 hover:bg-red-900/10 transition-colors"
           >
-            Kabul Et
+            Mühürle
           </button>
         </div>
       </div>
@@ -52,23 +68,32 @@ function VoidWarning({ node, onConfirm, onCancel }: {
   );
 }
 
-export default function SkillTreeView() {
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function SkillTreeView({ isOpen, onClose }: Props) {
   const dp         = useSkillTreeStore(s => s.dp);
   const purchased  = useSkillTreeStore(s => s.purchased);
   const canUnlock  = useSkillTreeStore(s => s.canUnlock);
   const unlockNode = useSkillTreeStore(s => s.unlockNode);
   const bonuses    = useSkillTreeStore(s => s.bonuses);
+  
+  const prestigePowersSD = useGameStore(s => s.prestigePowersSD);
+  const hasWisdom = prestigePowersSD?.some(p => p.id === 'infinite_wisdom' && p.purchased);
+  const costMult = hasWisdom ? 0.5 : 1;
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [voidPending, setVoidPending] = useState<string | null>(null);
   const [activeBranch, setActiveBranch] = useState<SkillBranch | 'all'>('all');
 
-  // Filter nodes by branch
+  if (!isOpen) return null;
+
   const visibleNodes = activeBranch === 'all'
     ? SKILL_NODES
     : SKILL_NODES.filter(n => n.branch === activeBranch);
 
-  // SVG bounding box
   const maxCol = Math.max(...visibleNodes.map(n => n.col));
   const maxRow = Math.max(...visibleNodes.map(n => n.row));
   const svgW   = nodeX(maxCol) + NODE_W + PADDING;
@@ -76,56 +101,75 @@ export default function SkillTreeView() {
 
   const handleNodeClick = (nodeId: string) => {
     const node = SKILL_NODES.find(n => n.id === nodeId);
-    if (!node || !canUnlock(nodeId)) return;
+    if (!node || !canUnlock(nodeId, costMult)) return;
     if (node.voidPath) {
       setVoidPending(nodeId);
     } else {
-      unlockNode(nodeId);
+      unlockNode(nodeId, costMult);
     }
   };
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-black/40">
-        <div className="flex items-center gap-2 font-cinzel text-xs tracking-[0.25em] uppercase text-void">
-          🕸 Lanet Ağacı
+    <div 
+      className="fixed inset-0 z-[150] flex flex-col backdrop-blur-3xl animate-in fade-in duration-700 overflow-hidden"
+      style={{ background: '#0d0809' }}
+    >
+      <RuneCorner position="top-left" opacity={0.3} size={48} className="m-2" />
+      <RuneCorner position="top-right" opacity={0.3} size={48} className="m-2" />
+      <RuneCorner position="bottom-left" opacity={0.3} size={48} className="m-2" />
+      <RuneCorner position="bottom-right" opacity={0.3} size={48} className="m-2" />
+
+      {/* Header */}
+      <div 
+        className="flex items-center justify-between px-8 py-6 border-b relative z-10"
+        style={{ background: '#0a0608aa', borderColor: '#1e1210' }}
+      >
+        <div className="flex items-center gap-4 font-cinzel text-xl tracking-[0.4em] uppercase text-stone-200 font-black">
+          <Hexagon size={24} className="text-[#c9a85c] opacity-70" />
+          Lanet Ağacı
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-ink-dim font-cinzel">Rüya Parçası:</span>
-          <span className="text-sm font-black text-purple-400 font-cinzel">{dp} DP</span>
+        
+        <div className="flex items-center gap-8">
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] text-stone-600 font-black font-cinzel uppercase tracking-[0.3em]">Rüya Parçaları</span>
+            <span className="text-2xl font-black text-purple-400 font-cinzel tracking-widest" style={{ textShadow: '0 0 15px rgba(168,85,247,0.3)' }}>{dp} DP</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-10 h-10 flex items-center justify-center text-stone-600 hover:text-red-500 border border-stone-900 hover:border-red-900/40 rounded-sm transition-all duration-300"
+          >
+            <X size={20} />
+          </button>
         </div>
       </div>
 
-      {/* ── Branch filter tabs ── */}
-      <div className="flex border-b border-border bg-black/30">
+      {/* Tabs */}
+      <div className="flex border-b relative z-10" style={{ background: '#0d0809', borderColor: '#1e1210' }}>
         {(['all', 'death', 'decay', 'chaos', 'void'] as const).map(branch => {
-          const meta = branch === 'all' ? { label: 'Tümü', icon: '✦', color: '#a09faf' } : BRANCH_META[branch];
+          const meta = branch === 'all' ? { label: 'Tümü', icon: '✦', color: '#c9a85c' } : BRANCH_META[branch];
+          const isActive = activeBranch === branch;
           return (
             <button
               key={branch}
               onClick={() => setActiveBranch(branch)}
-              className={[
-                'flex-1 py-1.5 font-cinzel text-[0.6rem] uppercase tracking-wider transition-colors',
-                activeBranch === branch ? 'border-b-2' : 'text-ink-dim hover:text-ink',
-              ].join(' ')}
-              style={activeBranch === branch ? { color: meta.color, borderColor: meta.color } : {}}
+              className={`flex-1 py-4 font-cinzel text-xs uppercase tracking-[0.3em] transition-all duration-500
+                ${isActive ? 'font-black' : 'text-stone-700 hover:text-stone-400 hover:bg-white/[0.01]'}`}
+              style={isActive ? { color: meta.color, background: `${meta.color}08`, boxShadow: `inset 0 -2px 0 ${meta.color}` } : {}}
             >
-              {meta.icon} {meta.label}
+              <span className="mr-2 opacity-50">{meta.icon}</span> {meta.label}
             </button>
           );
         })}
       </div>
 
-      {/* ── SVG Tree ── */}
-      <div className="flex-1 overflow-auto p-2">
+      {/* SVG Tree Content */}
+      <div className="flex-1 overflow-auto p-8 scrollbar-none relative z-10">
         <svg
           width={svgW}
           height={svgH}
-          className="min-w-full"
-          style={{ minHeight: svgH }}
+          className="mx-auto"
         >
-          {/* Edges (connections) */}
+          {/* Connections (Lines) */}
           {visibleNodes.map(node =>
             node.requires
               .filter(reqId => visibleNodes.some(n => n.id === reqId))
@@ -142,9 +186,10 @@ export default function SkillTreeView() {
                     y1={nodeY(parent.row) + NODE_H / 2}
                     x2={nodeX(node.col)}
                     y2={nodeY(node.row)  + NODE_H / 2}
-                    stroke={isPurchased ? branchMeta.color : '#ffffff15'}
+                    stroke={isPurchased ? branchMeta.color : '#1e1210'}
                     strokeWidth={isPurchased ? 2 : 1}
-                    strokeDasharray={isPurchased ? '0' : '4 3'}
+                    strokeDasharray={isPurchased ? '0' : '5 4'}
+                    className="transition-all duration-1000"
                   />
                 );
               })
@@ -153,24 +198,27 @@ export default function SkillTreeView() {
           {/* Nodes */}
           {visibleNodes.map(node => {
             const isPurchased  = purchased.has(node.id);
-            const canBuy       = canUnlock(node.id);
+            const canBuy       = canUnlock(node.id, costMult);
             const isHovered    = hoveredId === node.id;
             const branchMeta   = BRANCH_META[node.branch];
             const x = nodeX(node.col);
             const y = nodeY(node.row);
 
-            let fillColor = '#0a060f';
-            let strokeColor = '#ffffff18';
-            let opacity = 0.45;
+            let strokeColor = '#1e1210';
+            let fillColor = '#0a0608';
+            let textColor = '#2a1810';
+            let dpColor = '#2a1810';
 
             if (isPurchased) {
-              fillColor  = `${branchMeta.color}22`;
               strokeColor = branchMeta.color;
-              opacity    = 1;
+              fillColor = `${branchMeta.color}15`;
+              textColor = branchMeta.color;
+              dpColor = '#10b981';
             } else if (canBuy) {
-              fillColor  = `${branchMeta.color}10`;
-              strokeColor = `${branchMeta.color}70`;
-              opacity    = 1;
+              strokeColor = `${branchMeta.color}44`;
+              fillColor = `${branchMeta.color}05`;
+              textColor = '#a8a29e';
+              dpColor = '#c4b5fd';
             }
 
             return (
@@ -179,62 +227,75 @@ export default function SkillTreeView() {
                 onClick={() => handleNodeClick(node.id)}
                 onMouseEnter={() => setHoveredId(node.id)}
                 onMouseLeave={() => setHoveredId(null)}
-                style={{ cursor: canBuy ? 'pointer' : isPurchased ? 'default' : 'not-allowed', opacity }}
+                className="transition-all duration-300"
+                style={{ cursor: canBuy ? 'pointer' : isPurchased ? 'default' : 'not-allowed' }}
               >
-                {/* Node rect */}
+                {/* Node Box */}
                 <rect
                   x={x} y={y} width={NODE_W} height={NODE_H}
-                  rx={8} ry={8}
+                  rx={2} ry={2}
                   fill={fillColor}
                   stroke={isHovered && canBuy ? branchMeta.color : strokeColor}
-                  strokeWidth={isPurchased ? 1.5 : isHovered ? 1.5 : 1}
-                  filter={isPurchased ? `drop-shadow(0 0 6px ${branchMeta.color}60)` : undefined}
+                  strokeWidth={isPurchased ? 1.5 : (isHovered && canBuy) ? 1.5 : 1}
+                  className="transition-all duration-300"
                 />
 
-                {/* Void badge */}
+                {/* Branch Accent (Left Bar) */}
+                <rect 
+                  x={x} y={y} width="3" height={NODE_H} 
+                  fill={isPurchased || canBuy ? branchMeta.color : '#1e1210'} 
+                  className="transition-all duration-500"
+                />
+
+                {/* Void Icon */}
                 {node.voidPath && (
-                  <text x={x + NODE_W - 10} y={y + 14} textAnchor="middle" fontSize={10}>⚠️</text>
+                  <text x={x + NODE_W - 14} y={y + 16} textAnchor="middle" fontSize={10} className="opacity-50">⚠️</text>
                 )}
 
-                {/* Name */}
+                {/* Node Name */}
                 <text
-                  x={x + NODE_W / 2} y={y + 20}
-                  textAnchor="middle"
-                  fontSize={11}
-                  fontWeight="bold"
-                  fontFamily="'Cormorant SC', serif"
-                  fill={isPurchased ? branchMeta.color : canBuy ? '#fef9ec' : '#6b7280'}
+                  x={x + 12} y={y + 26}
+                  textAnchor="start"
+                  fontSize={13}
+                  fontWeight="900"
+                  fontFamily="Cinzel, serif"
+                  fill={textColor}
+                  className="transition-colors duration-300 uppercase tracking-wider"
                 >
                   {node.name}
                 </text>
 
-                {/* Cost */}
+                {/* Node Cost */}
                 <text
-                  x={x + NODE_W / 2} y={y + 34}
-                  textAnchor="middle"
-                  fontSize={9}
-                  fontFamily="'Alegreya Sans', sans-serif"
-                  fill={isPurchased ? '#10b981' : canBuy ? '#a78bfa' : '#4b5563'}
+                  x={x + 12} y={y + 48}
+                  textAnchor="start"
+                  fontSize={10}
+                  fontWeight="900"
+                  fontFamily="Cinzel, serif"
+                  fill={dpColor}
+                  className="transition-colors duration-300 opacity-60 tracking-tighter"
                 >
-                  {isPurchased ? '✓ Alındı' : `${node.dpCost} DP`}
+                  {isPurchased ? '✓ MÜHÜRLENDİ' : `${Math.floor(node.dpCost * costMult)} PARÇA`}
                 </text>
 
-                {/* Effect (on hover) */}
+                {/* Tooltip-like effect on hover */}
                 {isHovered && (
-                  <>
+                  <g className="animate-in fade-in zoom-in-95 duration-200">
                     <rect
-                      x={x} y={y + NODE_H + 4} width={NODE_W + 20} height={28}
-                      rx={4} fill="#050010" stroke={branchMeta.color} strokeWidth={0.8} opacity={0.95}
+                      x={x} y={y + NODE_H + 4} width={NODE_W * 1.5} height={40}
+                      rx={2} fill="#0a0608" stroke={branchMeta.color} strokeWidth={1}
+                      className="shadow-2xl z-50"
                     />
                     <text
-                      x={x + (NODE_W + 20) / 2} y={y + NODE_H + 18}
-                      textAnchor="middle" fontSize={8.5}
+                      x={x + 10} y={y + NODE_H + 28}
+                      textAnchor="start" fontSize={11}
+                      fontWeight="500"
                       fontFamily="'Alegreya Sans', sans-serif"
-                      fill="#fef9ec"
+                      fill="#d1d5db"
                     >
                       {node.effect}
                     </text>
-                  </>
+                  </g>
                 )}
               </g>
             );
@@ -242,27 +303,34 @@ export default function SkillTreeView() {
         </svg>
       </div>
 
-      {/* ── Active Bonuses summary ── */}
-      <div className="border-t border-border bg-black/40 px-3 py-2">
-        <div className="text-[0.6rem] font-cinzel uppercase tracking-widest text-ink-dim/60 mb-1">Aktif Bonuslar</div>
-        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[0.65rem] text-ink-dim">
-          {bonuses.globalSEMult > 1     && <span>🔁 Üretim ×{bonuses.globalSEMult.toFixed(2)}</span>}
-          {bonuses.clickMult > 1        && <span>👆 Click ×{bonuses.clickMult.toFixed(2)}</span>}
-          {bonuses.ritualChanceBonus > 0 && <span>🔮 Ritüel +%{Math.round(bonuses.ritualChanceBonus * 100)}</span>}
-          {bonuses.offlineMult > 1      && <span>💤 Offline ×{bonuses.offlineMult.toFixed(1)}</span>}
-          {bonuses.buildTimeMult < 1    && <span>🏗 İnşaat −%{Math.round((1 - bonuses.buildTimeMult) * 100)}</span>}
-          {bonuses.curseStoneBonus > 0  && <span>💎 +{bonuses.curseStoneBonus}/sn</span>}
+      {/* Footer Bonuses Summary */}
+      <div 
+        className="px-10 py-6 border-t relative z-10"
+        style={{ background: '#0a0608', borderColor: '#1e1210' }}
+      >
+        <div className="text-[10px] font-cinzel font-black uppercase tracking-[0.4em] text-[#c9a85c] mb-4 flex items-center gap-3">
+          <Sparkles size={12} className="opacity-50" />
+          Karakter Bağlantıları & Aktif Sırr-ı Kadim
+          <div className="flex-1 h-px bg-white/5" />
+        </div>
+        <div className="flex flex-wrap gap-x-10 gap-y-3 text-[11px] text-stone-500 font-black uppercase tracking-widest">
+          {bonuses.globalSEMult > 1     && <span className="flex items-center gap-2"><div className="w-1 h-1 bg-red-500 rounded-full" /> Ruh ×{bonuses.globalSEMult.toFixed(2)}</span>}
+          {bonuses.clickMult > 1        && <span className="flex items-center gap-2"><div className="w-1 h-1 bg-amber-500 rounded-full" /> Pençe ×{bonuses.clickMult.toFixed(2)}</span>}
+          {bonuses.ritualChanceBonus > 0 && <span className="flex items-center gap-2"><div className="w-1 h-1 bg-purple-500 rounded-full" /> Ayin +%{Math.round(bonuses.ritualChanceBonus * 100)}</span>}
+          {bonuses.offlineMult > 1      && <span className="flex items-center gap-2"><div className="w-1 h-1 bg-blue-500 rounded-full" /> Uyku ×{bonuses.offlineMult.toFixed(1)}</span>}
+          {bonuses.buildTimeMult < 1    && <span className="flex items-center gap-2"><div className="w-1 h-1 bg-emerald-500 rounded-full" /> Mimari −%{Math.round((1 - bonuses.buildTimeMult) * 100)}</span>}
+          {bonuses.curseStoneBonus > 0  && <span className="flex items-center gap-2"><div className="w-1 h-1 bg-white rounded-full" /> Cevher +{bonuses.curseStoneBonus}/sn</span>}
           {purchased.size === 0 && (
-            <span className="italic opacity-50">Henüz node alınmadı — Rüya Parçası kazan!</span>
+            <span className="italic opacity-30">Ağaç henüz filizlenmedi — Rüya Parçası topla!</span>
           )}
         </div>
       </div>
 
-      {/* ── Void Warning Modal ── */}
+      {/* Void Warning Modal */}
       {voidPending && (
         <VoidWarning
           node={SKILL_NODES.find(n => n.id === voidPending)!}
-          onConfirm={() => { unlockNode(voidPending!); setVoidPending(null); }}
+          onConfirm={() => { unlockNode(voidPending!, costMult); setVoidPending(null); }}
           onCancel={() => setVoidPending(null)}
         />
       )}

@@ -8,21 +8,36 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   html { 
-    font-size: 17px;
+    font-size: 18px;
     height: 100vh;
     overflow: hidden; 
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  :root {
+    --grimore-bg: #0d0809;
+    --grimore-stone: #0a0608;
+    --grimore-border: #1e1210;
+    --grimore-gold: #c9a85c;
+    --grimore-gold-bright: #f0c060;
+    --grimore-bronze: #7a5a30;
   }
 
   body {
     @apply bg-dark text-ink font-crimson h-full overflow-hidden;
+    background-color: var(--grimore-bg);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    letter-spacing: 0.015em;
   }
 
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-border rounded; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+  ::-webkit-scrollbar-thumb { @apply bg-gold/30 rounded-full border-2 border-transparent bg-clip-content; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-gold/50; }
 }
 
 @layer utilities {

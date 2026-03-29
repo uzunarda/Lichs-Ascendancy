@@ -1,7 +1,8 @@
-import { X, Volume2, VolumeX, AlertTriangle, Trash2 } from 'lucide-react';
+import { X, Volume2, VolumeX, AlertTriangle, Trash2, Settings } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { soundManager } from '../systems/soundManager';
 import { useState } from 'react';
+import RuneCorner from './shared/RuneCorner';
 
 interface Props {
   isOpen: boolean;
@@ -26,68 +27,78 @@ export default function SettingsModal({ isOpen, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm anim-fade-in">
-      <div className="relative w-full max-w-sm bg-mid border border-border shadow-2xl rounded-lg overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-black/40">
-          <h2 className="font-cinzel text-[0.9rem] tracking-widest text-gold uppercase flex items-center gap-2">
-            ⚙️ Ayarlar
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+      <div 
+        className="relative w-full max-w-sm border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
+        style={{ background: '#0a0608', borderColor: '#1e1210' }}
+      >
+        <RuneCorner position="top-left" opacity={0.4} />
+        <RuneCorner position="top-right" opacity={0.4} />
+        <RuneCorner position="bottom-left" opacity={0.4} />
+        <RuneCorner position="bottom-right" opacity={0.4} />
+
+        {/* Header */}
+        <div 
+          className="flex items-center justify-between px-6 py-4 border-b relative z-10"
+          style={{ background: '#0d0809ee', borderColor: '#1e1210' }}
+        >
+          <h2 className="font-cinzel text-[10px] md:text-xs tracking-[0.35em] text-[#c9a85c] font-black uppercase flex items-center gap-3">
+            <Settings size={18} className="opacity-70" />
+            Sistem Ayarları
           </h2>
           <button
-            onClick={() => {
-              setShowConfirm(false);
-              onClose();
-            }}
-            className="text-ink-dim hover:text-white transition-colors p-1"
-            aria-label="Kapat"
+            onClick={() => { setShowConfirm(false); onClose(); }}
+            className="w-8 h-8 flex items-center justify-center text-stone-600 hover:text-red-500 border border-stone-900 hover:border-red-900/40 rounded-sm transition-all duration-300"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         
-        <div className="flex flex-col p-6 gap-6">
-          <div className="flex items-center justify-between bg-black/20 p-4 rounded border border-border">
-            <span className="text-ink-dim uppercase tracking-widest text-sm font-cinzel">Ses Efektleri</span>
+        <div className="flex flex-col p-8 gap-8 relative z-10">
+          {/* Sound Toggle */}
+          <div className="flex items-center justify-between p-4 rounded-sm border border-stone-900 bg-stone-950/20">
+            <span className="text-stone-500 uppercase tracking-[0.2em] text-[10px] font-black font-cinzel">Ruhların Sesi</span>
             <button
               onClick={toggleSound}
-              className={`p-2 rounded border transition-colors ${
+              className={`w-12 h-12 flex items-center justify-center rounded-sm border transition-all duration-300 ${
                 isMuted 
-                  ? 'border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20' 
-                  : 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                  ? 'border-red-950 text-red-900 bg-red-950/10 hover:border-red-600 hover:text-red-600' 
+                  : 'border-emerald-950 text-emerald-900 bg-emerald-950/10 hover:border-emerald-500 hover:text-emerald-500'
               }`}
-              aria-label={isMuted ? 'Sesi Aç' : 'Sesi Kapat'}
             >
               {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
             </button>
           </div>
 
-          <div className="border-t border-border pt-6">
+          {/* Danger Zone */}
+          <div className="border-t border-white/5 pt-8">
             {!showConfirm ? (
               <button
                 onClick={() => setShowConfirm(true)}
-                className="w-full py-3 flex items-center justify-center gap-2 rounded text-red-500 border border-red-500/30 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500/50 transition-all uppercase tracking-widest text-xs font-cinzel font-bold"
+                className="w-full py-4 flex items-center justify-center gap-3 rounded-sm text-stone-700 border border-stone-900 hover:text-red-600 hover:border-red-900/40 hover:bg-red-950/5 transition-all uppercase tracking-[0.3em] text-[10px] font-black font-cinzel"
               >
-                <Trash2 size={16} /> Verileri Temizle
+                <Trash2 size={16} /> Hafızayı Mühürle
               </button>
             ) : (
-              <div className="flex flex-col gap-3 anim-fade-in">
-                <div className="flex items-start gap-3 text-red-400/90 text-xs border border-red-500/30 p-3 bg-red-500/10 rounded">
-                  <AlertTriangle size={24} className="shrink-0 text-red-500" />
-                  <span className="leading-snug">
-                    Tüm ilerlemen, ordun, ve SE'n tamamen silinecek. <br/><strong>Bu işlem geri alınamaz!</strong> Emin misin?
+              <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+                <div className="flex items-start gap-4 text-red-600/80 text-[10px] border border-red-900/30 p-4 bg-red-950/5 rounded-sm font-bold uppercase tracking-widest leading-relaxed">
+                  <AlertTriangle size={24} className="shrink-0 text-red-600 animate-pulse" />
+                  <span>
+                    Tüm ilerlemen, ordun ve kazandığın güçler sonsuza dek silinecek. <br/><span className="text-red-500 font-black">Geri Dönüş Yok!</span>
                   </span>
                 </div>
-                <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-4">
                   <button
                     onClick={() => setShowConfirm(false)}
-                    className="flex-1 py-2.5 border border-border bg-surface text-ink-dim rounded hover:text-white transition-colors text-xs font-cinzel tracking-widest uppercase"
+                    className="flex-1 py-3 border border-stone-900 text-stone-600 hover:text-white transition-all text-[10px] font-black font-cinzel tracking-widest uppercase rounded-sm"
                   >
-                    İptal
+                    Vazgeç
                   </button>
                   <button
                     onClick={handleReset}
-                    className="flex-1 py-2.5 border border-red-500/50 bg-red-500/20 text-red-300 font-bold rounded hover:bg-red-500/40 hover:text-white transition-colors text-xs font-cinzel tracking-widest uppercase shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+                    className="flex-1 py-3 border border-red-900/40 bg-red-900/10 text-red-500 font-black hover:bg-red-900/20 transition-all text-[10px] font-black font-cinzel tracking-widest uppercase rounded-sm"
                   >
-                    Eminim, Sil
+                    SİLİNSİN
                   </button>
                 </div>
               </div>

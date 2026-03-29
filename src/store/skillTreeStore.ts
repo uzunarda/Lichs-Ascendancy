@@ -25,8 +25,8 @@ interface SkillTreeState {
 
   // Actions
   addDP: (amount: number) => void;
-  canUnlock: (nodeId: string) => boolean;
-  unlockNode: (nodeId: string) => boolean; // returns false if can't afford
+  canUnlock: (nodeId: string, costMult?: number) => boolean;
+  unlockNode: (nodeId: string, costMult?: number) => boolean; // returns false if can't afford
   resetVoidPath: () => void; // intentionally not available — gated in UI
   loadSkillTree: (saved: { dp: number; purchased: string[] }) => void;
   saveSkillTree: () => { dp: number; purchased: string[] };
@@ -97,24 +97,29 @@ export const useSkillTreeStore = create<SkillTreeState>((set, get) => ({
     set(s => ({ dp: s.dp + amount, totalDpEarned: s.totalDpEarned + amount }));
   },
 
-  canUnlock(nodeId) {
+  canUnlock(nodeId, costMult = 1) {
     const state = get();
     const node = SKILL_NODES.find(n => n.id === nodeId);
     if (!node) return false;
     if (state.purchased.has(nodeId)) return false;
-    if (state.dp < node.dpCost) return false;
+    
+    const effectiveCost = Math.floor(node.dpCost * costMult);
+
+    if (state.dp < effectiveCost) return false;
     return node.requires.every(req => state.purchased.has(req));
   },
 
-  unlockNode(nodeId) {
+  unlockNode(nodeId, costMult = 1) {
     const state = get();
-    if (!state.canUnlock(nodeId)) return false;
+    if (!state.canUnlock(nodeId, costMult)) return false;
     const node = SKILL_NODES.find(n => n.id === nodeId)!;
+
+    const effectiveCost = Math.floor(node.dpCost * costMult);
 
     const next = new Set(state.purchased);
     next.add(nodeId);
 
-    set({ dp: state.dp - node.dpCost, purchased: next, bonuses: calcBonuses(next) });
+    set({ dp: state.dp - effectiveCost, purchased: next, bonuses: calcBonuses(next) });
     return true;
   },
 
